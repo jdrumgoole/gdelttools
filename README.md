@@ -2,7 +2,7 @@
 Scripts to load the GDELT data set into MongoDB
 
 ```
-(gdeltloader) [ec2-user@ip-172-31-33-18 gdeltloader]$ python gdeltloader/gdeltloader.py -h
+$ python gdeltloader/gdeltloader.py -h
 usage: gdeltloader.py [-h] [--mongodb MONGODB]
                       [--ziplist {master,incremental}] [--master MASTER]
                       [--incremental INCREMENTAL] [--local LOCAL]
@@ -22,7 +22,6 @@ optional arguments:
   --overwrite           Overwrite files when they exist already
   --download            download zip files from master or local file
   --mapgeo              map all lat,lon data to GeoJSON
-(gdeltloader) [ec2-user@ip-172-31-33-18 gdeltloader]$
 ```
 
 To operate first get the master list of event files.
@@ -49,101 +48,8 @@ Now install pymongo_import
 pipenv install pymongo_import
 ```
 
+Now import the CSV files.
+```
 pymongo_import --host $MONGODB --fieldfile GDELT.ff --delimiter tab --database GDELT --collection events *.CSV
+```
 
-Partial index - didn't work
-db.events_geo.createIndex( { "Actor1Geo" : "2dsphere"}, {partialFilterExpression: {"Actor1Geo.coordinates.0": {$type: "number"}, "Actor1Geo.coordinates.1": {$type: "number"} }})
-db.events_geo.createIndex( { "Actor2Geo" : "2dsphere"}, {partialFilterExpression: {"Actor2Geo.coordinates.0": {$type: "number"}, "Actor2Geo.coordinates.1": {$type: "number"} }})
-db.events_geo.createIndex( { "ActionGeo" : "2dsphere"}, {partialFilterExpression: {"ActionGeo.coordinates.0": {$type: "number"}, "ActionGeo.coordinates.1": {$type: "number"} }})
-
-db.events_stripped.find(
-   {
-     ActionGeo:
-       { '$geoNear' :
-          {
-            '$geometry': { type: "Point",  coordinates: [ -0.118092, 51.509865 ] },
-            '$minDistance': 1000,
-            '$maxDistance': 5000
-          }
-       }
-   }
-)
-
-db.events.aggregate( [
-   {
-     "$project" : {
-         "ActionGeo": {
-            $cond: {
-               if: { $eq: [ "", "$ActionGeo.coordinates.0" ] },
-               then: "$$REMOVE",
-               else: "ActionGeo.coordinates.0"
-            }
-         }
-      }
-   }
-] )
-
-===>
-MongoDB Enterprise GDELT-shard-0:PRIMARY> cond1
-{
-	"$cond" : {
-		"if" : {
-			"$eq" : [
-				"$Actor1Geo_Long",
-				""
-			]
-		},
-		"then" : 0,
-		"else" : "$Actor1Geo_Long"
-	}
-}
-
-MongoDB Enterprise GDELT-shard-0:PRIMARY> cond2
-{
-	"$cond" : {
-		"if" : {
-			"$eq" : [
-				"$Actor1Geo_Lat",
-				""
-			]
-		},
-		"then" : 0,
-		"else" : "$Actor1Geo_Lat"
-	}
-}
-MongoDB Enterprise GDELT-shard-0:PRIMARY>
-
-MongoDB Enterprise GDELT-shard-0:PRIMARY> adder
-{
-	"$addFields" : {
-		"ActionGeo" : {
-			"type" : "Point",
-			"coordinates" : [
-				{
-					"$cond" : {
-						"if" : {
-							"$eq" : [
-								"$Actor1Geo_Long",
-								""
-							]
-						},
-						"then" : 0,
-						"else" : "$Actor1Geo_Long"
-					}
-				},
-				{
-					"$cond" : {
-						"if" : {
-							"$eq" : [
-								"$Actor1Geo_Lat",
-								""
-							]
-						},
-						"then" : 0,
-						"else" : "$Actor1Geo_Lat"
-					}
-				}
-			]
-		}
-	}
-}
