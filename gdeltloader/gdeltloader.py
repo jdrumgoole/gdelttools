@@ -74,6 +74,12 @@ if __name__ == "__main__":
                         default="http://data.gdeltproject.org/gdeltv2/lastupdate.txt",
                         help="GDELT incremental file [%(default)s]")
 
+    parser.add_argument("--database", default="GDELT",
+                        help="Default database for loading [%(default)s]")
+
+    parser.add_argument("--collection", default="events",
+                        help="Default collection for loading [%(default)s]")
+
     parser.add_argument("--local", help="load data from local list of zips")
     parser.add_argument("--overwrite",
                         default=False, action="store_true",
@@ -92,9 +98,9 @@ if __name__ == "__main__":
         url = args.incremental
 
     client = pymongo.MongoClient(host=args.mongodb)
-    db=client["GDELT"]
+    db=client[args.database]
     files_collection = db["files"]
-    events__collection =db["events"]
+    events__collection =db[args.collection]
 
     if args.mapgeo:
         print("Mapping lat/lon to GeoJSON")
