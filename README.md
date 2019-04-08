@@ -2,11 +2,11 @@
 Scripts to load the GDELT data set into MongoDB
 
 ```
-$ python gdeltloader/gdeltloader.py  -h
+(gdeltloader) [ec2-user@ip-172-31-33-18 gdeltloader]$ python gdeltloader/gdeltloader.py -h
 usage: gdeltloader.py [-h] [--mongodb MONGODB]
-                      [--download {master,incremental}] [--master MASTER]
+                      [--ziplist {master,incremental}] [--master MASTER]
                       [--incremental INCREMENTAL] [--local LOCAL]
-                      [--overwrite] [--mapgeo]
+                      [--overwrite] [--download] [--mapgeo]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -20,7 +20,9 @@ optional arguments:
                         [http://data.gdeltproject.org/gdeltv2/lastupdate.txt]
   --local LOCAL         load data from local list of zips
   --overwrite           Overwrite files when they exist already
+  --download            download zip files from master or local file
   --mapgeo              map all lat,lon data to GeoJSON
+(gdeltloader) [ec2-user@ip-172-31-33-18 gdeltloader]$
 ```
 
 To operate first get the master list of event files.
