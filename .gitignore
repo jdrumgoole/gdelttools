@@ -101,4 +101,12 @@ venv.bak/
 /site
 
 # mypy
+
+#Data files for GDELT
+*.csv
+*.CSV
+*.csv.zip
+*.CSV.zip
+
 .mypy_cache/
+.idea/

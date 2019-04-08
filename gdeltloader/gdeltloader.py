@@ -64,7 +64,7 @@ if __name__ == "__main__":
     parser.add_argument("--mongodb", default="mongodb://localhost:27017",
                         help="MongoDB URI [%(default)s]")
 
-    parser.add_argument("--download", choices=["master", "incremental"],
+    parser.add_argument("--ziplist", choices=["master", "incremental"],
                         default="incremental",
                         help="Download master or incremental file")
     parser.add_argument("--master",
@@ -79,12 +79,14 @@ if __name__ == "__main__":
                         default=False, action="store_true",
                         help="Overwrite files when they exist already")
 
+    parser.add_argument("--download", default=False, action="store_true",
+                        help="download zip files from master or local file")
     parser.add_argument("--mapgeo", default=False,
                         action="store_true",
                         help="map all lat,lon data to GeoJSON")
     args = parser.parse_args()
 
-    if args.download == "master":
+    if args.ziplist == "master":
         url = args.master
     else:
         url = args.incremental
@@ -108,45 +110,52 @@ if __name__ == "__main__":
         else:
             print(f"'{args.local}' does not exist")
             sys.exit(1)
-    else:
-        print(f"Getting master file from '{url}'")
+    elif args.ziplist:
+        if args.ziplist == "master":
+            print(f"Getting incremental file from '{url}'")
+            url = args.master
+        else:
+            print(f"Getting master file from '{url}'")
+            url = args.incremental
+
         r = requests.get(url, allow_redirects=True)
 
-        filename=f"gdelt_{args.download}-file-{datetime.utcnow().strftime('%m-%d-%Y-%H-%M-%S')}.txt"
+        filename=f"gdelt_{args.ziplist}-file-{datetime.utcnow().strftime('%m-%d-%Y-%H-%M-%S')}.txt"
         print(f"Creating local master file: '{filename}'")
         open(filename, 'w').write(r.content.decode("utf-8"))
 
-    with open(filename, "r") as file_list:
-        for l in file_list:
-            size, md5, zip = l.split()
-            size = int(size)
-            md5 = str(md5)
-            #print(f"{size}:{sha}:{zip}")
-            if os.path.exists(local_path(zip)) and not args.overwrite:
-                print( f"File '{local_path(zip)}'exists locally")
-                local_zip_file = local_path(zip)
-            else:
-                print(f"Downloading:'{zip}'")
-                print(f"size:{size}")
-                print(f"md5:{md5}")
-                local_zip_file = download_file(zip)
-                print(f"created: '{local_zip_file}'")
-
-                computed_md5 = compute_md5(local_zip_file)
-                if computed_md5 == md5:
-                    files_collection.insert_one({ "ts"     : datetime.utcnow(),
-                                                  "remote" : zip,
-                                                  "local"  : local_zip_file,
-                                                  "size"   : size,
-                                                   "md5"   : md5})
+    if args.download:
+        with open(filename, "r") as file_list:
+            for l in file_list:
+                size, md5, zip = l.split()
+                size = int(size)
+                md5 = str(md5)
+                #print(f"{size}:{sha}:{zip}")
+                if os.path.exists(local_path(zip)) and not args.overwrite:
+                    print( f"File '{local_path(zip)}'exists locally")
+                    local_zip_file = local_path(zip)
                 else:
-                    print(f"'{md5}' checksum for doesn't match computed checksum: {computed_md5} for {local_zip_file}")
-                    continue
+                    print(f"Downloading:'{zip}'")
+                    print(f"size:{size}")
+                    print(f"md5:{md5}")
+                    local_zip_file = download_file(zip)
+                    print(f"created: '{local_zip_file}'")
 
-            print(f"Unzipping: '{local_zip_file}'")
+                    computed_md5 = compute_md5(local_zip_file)
+                    if computed_md5 == md5:
+                        files_collection.insert_one({ "ts"     : datetime.utcnow(),
+                                                      "remote" : zip,
+                                                      "local"  : local_zip_file,
+                                                      "size"   : size,
+                                                       "md5"   : md5})
+                    else:
+                        print(f"'{md5}' checksum for doesn't match computed checksum: {computed_md5} for {local_zip_file}")
+                        continue
 
-            local_csv_files = extract_zip_file(local_zip_file)
+                print(f"Unzipping: '{local_zip_file}'")
 
-            for i in local_csv_files:
-                print(l)
+                local_csv_files = extract_zip_file(local_zip_file)
+
+                for i in local_csv_files:
+                    print(l)
 
