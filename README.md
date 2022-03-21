@@ -10,7 +10,7 @@ usage: gdeltloader.py [-h] [--mongodb MONGODB]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --mongodb MONGODB     MongoDB URI [mongodb://localhost:27017]
+  --host URL            MongoDB URI [mongodb://localhost:27017]
   --ziplist {master,incremental}
                         Download master or incremental file
   --master MASTER       GDELT master file [http://data.gdeltproject.org/gdeltv
@@ -39,17 +39,17 @@ $
 now download the data.
 
 ```shell
-python  --mongodb mongodb+srv://<username:<password>@gdelt-rgl39.mongodb.net/test?retryWrites=true --download last_365_days.txt 
+python gdeltloader/gdeltloader.py --host $MONGODB --download --local last_365_days.txt 
 ```
 
-Now install pymongo_import
+Now install pymongoimport
 
 ```sh
-pipenv install pymongo_import
+pipenv install pymongoimport
 ```
 
 Now import the CSV files.
 ```
-pymongo_import --host $MONGODB --fieldfile GDELT.ff --delimiter tab --database GDELT --collection events *.CSV
+pymongoimport --host $MONGODB --fieldfile GDELT.ff --delimiter tab --database GDELT --collection events *.CSV
 ```
 

@@ -16,6 +16,23 @@ import pymongo
 import hashlib
 import zipfile
 
+from io import BytesIO
+from zipfile import ZipFile
+import urllib.request
+
+
+def download_and_unzip(u: str):
+    url_file = urllib.request.urlopen(u)
+
+    with ZipFile(BytesIO(url_file.read())) as my_zip_file:
+        my_zip_file.extractall()
+        # for contained_file in my_zip_file.namelist():
+        #     # with open(("unzipped_and_read_" + contained_file + ".file"), "wb") as output:
+        #     for line in my_zip_file.open(contained_file).readlines():
+        #         print(line)
+        #         # output.write(line)
+
+
 def compute_md5(file):
     hasher = hashlib.md5()
     with open(file, 'rb') as input:
@@ -24,8 +41,10 @@ def compute_md5(file):
 
     return hasher.hexdigest()
 
+
 def local_path(url):
     return  url.split('/')[-1]
+
 
 def download_file(url):
     local_filename = local_path(url)
@@ -44,6 +63,7 @@ def download_file(url):
                 print("")
     return local_filename
 
+
 def extract_zip_file(filepath):
     zfile = zipfile.ZipFile(filepath)
     files=[]
@@ -61,15 +81,17 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--mongodb", default="mongodb://localhost:27017",
+    parser.add_argument("--host", default="mongodb://localhost:27017",
                         help="MongoDB URI [%(default)s]")
 
     parser.add_argument("--ziplist", choices=["master", "incremental"],
                         default="incremental",
                         help="Download master or incremental file")
+
     parser.add_argument("--master",
                         default="http://data.gdeltproject.org/gdeltv2/masterfilelist.txt",
                         help="GDELT master file [%(default)s]")
+
     parser.add_argument("--incremental",
                         default="http://data.gdeltproject.org/gdeltv2/lastupdate.txt",
                         help="GDELT incremental file [%(default)s]")
@@ -81,15 +103,20 @@ if __name__ == "__main__":
                         help="Default collection for loading [%(default)s]")
 
     parser.add_argument("--local", help="load data from local list of zips")
+
     parser.add_argument("--overwrite",
                         default=False, action="store_true",
                         help="Overwrite files when they exist already")
 
     parser.add_argument("--download", default=False, action="store_true",
                         help="download zip files from master or local file")
+
     parser.add_argument("--mapgeo", default=False,
                         action="store_true",
                         help="map all lat,lon data to GeoJSON")
+
+    parser.add_argument("--metadata", action="store_true", default=False,
+                        help="grab meta data files")
     args = parser.parse_args()
 
     if args.ziplist == "master":
@@ -97,10 +124,23 @@ if __name__ == "__main__":
     else:
         url = args.incremental
 
-    client = pymongo.MongoClient(host=args.mongodb)
+    gdelt_md5_list = "http://data.gdeltproject.org/events/md5sums"
+    gdelt_file_sizes = "http://data.gdeltproject.org/events/filesizes"
+
+    client = pymongo.MongoClient(host=args.host)
     db=client[args.database]
     files_collection = db["files"]
     events__collection =db[args.collection]
+
+    if args.metadata:
+        r = requests.get(gdelt_md5_list, allow_redirects=True)
+        with open("gdelt_md5sums", "w") as output_file:
+            output_file.write(r.content.decode("utf-8"))
+        print(f"downloaded {gdelt_md5_list} to gdelt_md5sums")
+        r = requests.get(gdelt_file_sizes, allow_redirects=True)
+        with open("gdelt_filesizes", "w") as output_file:
+            output_file.write(r.content.decode("utf-8"))
+        print(f"downloaded {gdelt_file_sizes} to gdelt_filesizes")
 
     if args.mapgeo:
         print("Mapping lat/lon to GeoJSON")
