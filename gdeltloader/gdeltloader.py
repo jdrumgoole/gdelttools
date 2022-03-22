@@ -21,6 +21,7 @@ from zipfile import ZipFile
 import urllib.request
 
 
+
 def download_and_unzip(u: str):
     url_file = urllib.request.urlopen(u)
 
@@ -43,7 +44,7 @@ def compute_md5(file):
 
 
 def local_path(url):
-    return  url.split('/')[-1]
+    return url.split('/')[-1]
 
 
 def download_file(url):
@@ -53,7 +54,7 @@ def download_file(url):
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
             for i, chunk in enumerate(r.iter_content(chunk_size=8192), 1):
-                if chunk: # filter out keep-alive new chunks
+                if chunk:  # filter out keep-alive new chunks
                     print(".", end="")
                     if i % 80 == 0:
                         print("")
@@ -66,7 +67,7 @@ def download_file(url):
 
 def extract_zip_file(filepath):
     zfile = zipfile.ZipFile(filepath)
-    files=[]
+    files = []
     for finfo in zfile.namelist():
         with zfile.open(finfo, "r") as input:
             with open(finfo, "w") as output:
@@ -99,7 +100,7 @@ if __name__ == "__main__":
     parser.add_argument("--database", default="GDELT",
                         help="Default database for loading [%(default)s]")
 
-    parser.add_argument("--collection", default="events",
+    parser.add_argument("--collection", default="events_csv",
                         help="Default collection for loading [%(default)s]")
 
     parser.add_argument("--local", help="load data from local list of zips")
@@ -110,10 +111,6 @@ if __name__ == "__main__":
 
     parser.add_argument("--download", default=False, action="store_true",
                         help="download zip files from master or local file")
-
-    parser.add_argument("--mapgeo", default=False,
-                        action="store_true",
-                        help="map all lat,lon data to GeoJSON")
 
     parser.add_argument("--metadata", action="store_true", default=False,
                         help="grab meta data files")
@@ -128,9 +125,9 @@ if __name__ == "__main__":
     gdelt_file_sizes = "http://data.gdeltproject.org/events/filesizes"
 
     client = pymongo.MongoClient(host=args.host)
-    db=client[args.database]
+    db = client[args.database]
     files_collection = db["files"]
-    events__collection =db[args.collection]
+    events__collection = db[args.collection]
 
     if args.metadata:
         r = requests.get(gdelt_md5_list, allow_redirects=True)
@@ -142,28 +139,9 @@ if __name__ == "__main__":
             output_file.write(r.content.decode("utf-8"))
         print(f"downloaded {gdelt_file_sizes} to gdelt_filesizes")
 
-    if args.mapgeo:
-        print("Mapping lat/lon to GeoJSON")
-        matcher = {"$match": {"ActionGeo_Lat": {"$type": "double"},
-                              "ActionGeo_Long": {"$type": "double"},
-                              "Actor1Geo_Lat": {"$type": "double"},
-                              "Actor1Geo_Long": {"$type": "double"},
-                              "Actor2Geo_Lat": {"$type": "double"},
-                              "Actor2Geo_Long": {"$type": "double"}}}
-    
-        adder = {"$addFields": {"Actor1Geo": {"type": "Point", "coordinates": ["$Actor1Geo_Long", "$Actor1Geo_Lat"]},
-                                "Actor2Geo": {"type": "Point", "coordinates": ["$Actor2Geo_Long", "$Actor2Geo_Lat"]},
-                                "ActionGeo": {"type": "Point", "coordinates": ["$ActionGeo_Long", "$ActionGeo_Lat"]}}}
-
-        deleter = {"$unset": ["ActionGeo_Lat", "ActionGeo_Long", "Actor1Geo_Lat",
-                              "Actor1Geo_Long", "Actor2Geo_Lat", "Actor2Geo_Long"]}
-
-        events__collection.aggregate([matcher, adder, deleter, {"$out": "events_geo"}])
-        sys.exit(0)
-
     if args.local:
         if os.path.isfile(args.local):
-            filename=args.local
+            filename = args.local
         else:
             print(f"'{args.local}' does not exist")
             sys.exit(1)
@@ -177,7 +155,7 @@ if __name__ == "__main__":
 
         r = requests.get(url, allow_redirects=True)
 
-        filename=f"gdelt_{args.ziplist}-file-{datetime.utcnow().strftime('%m-%d-%Y-%H-%M-%S')}.txt"
+        filename = f"gdelt_{args.ziplist}-file-{datetime.utcnow().strftime('%m-%d-%Y-%H-%M-%S')}.txt"
         print(f"Creating local master file: '{filename}'")
         open(filename, 'w').write(r.content.decode("utf-8"))
 
@@ -187,9 +165,9 @@ if __name__ == "__main__":
                 size, md5, zip = l.split()
                 size = int(size)
                 md5 = str(md5)
-                #print(f"{size}:{sha}:{zip}")
+                # print(f"{size}:{sha}:{zip}")
                 if os.path.exists(local_path(zip)) and not args.overwrite:
-                    print( f"File '{local_path(zip)}'exists locally")
+                    print(f"File '{local_path(zip)}'exists locally")
                     local_zip_file = local_path(zip)
                 else:
                     print(f"Downloading:'{zip}'")
@@ -200,13 +178,14 @@ if __name__ == "__main__":
 
                     computed_md5 = compute_md5(local_zip_file)
                     if computed_md5 == md5:
-                        files_collection.insert_one({ "ts"     : datetime.utcnow(),
-                                                      "remote" : zip,
-                                                      "local"  : local_zip_file,
-                                                      "size"   : size,
-                                                       "md5"   : md5})
+                        files_collection.insert_one({"ts": datetime.utcnow(),
+                                                     "remote": zip,
+                                                     "local": local_zip_file,
+                                                     "size": size,
+                                                     "md5": md5})
                     else:
-                        print(f"'{md5}' checksum for doesn't match computed checksum: {computed_md5} for {local_zip_file}")
+                        print(
+                            f"'{md5}' checksum for doesn't match computed checksum: {computed_md5} for {local_zip_file}")
                         continue
 
                 print(f"Unzipping: '{local_zip_file}'")
@@ -215,4 +194,3 @@ if __name__ == "__main__":
 
                 for i in local_csv_files:
                     print(l)
-

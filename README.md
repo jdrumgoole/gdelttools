@@ -1,27 +1,49 @@
-# gdeltloader
-Scripts to load the GDELT data set into MongoDB
+# Loading GDELT data into MongoDB
+
+## GDELT 2.0 Encoding and Structure
+The [GDELT](https://gdelt.org) dataset is a large dataset of news events that is updated
+in real-time. GDELT stands for Global Database of Events Location and Tone. The format
+of records in a GDELT data is defined by the [GDELT 2.0 Cookbook](http://data.gdeltproject.org/documentation/GDELT-Event_Codebook-V2.0.pdf)
+
+Each record uses an encoding method called CAMEO coding which is defined by the
+[CAMEO cookbook](https://parusanalytics.com/eventdata/cameo.dir/CAMEO.Manual.1.1b3.pdf).
+
+Once you understand the GDELT recording structure and the CAMEO encoding you will be able
+to decode a record.
+
+## How to download GDELT 2.0 data
+
+The `gdeltloader/gdeltloader.py` script can download cameo data an unzip the files so that
+they can be loaded into MongoDB.
 
 ```
 $ python gdeltloader/gdeltloader.py -h
-usage: gdeltloader.py [-h] [--mongodb MONGODB]
-                      [--ziplist {master,incremental}] [--master MASTER]
-                      [--incremental INCREMENTAL] [--local LOCAL]
-                      [--overwrite] [--download] [--mapgeo]
+usage: gdeltloader.py [-h] [--host HOST] 
+                        [--ziplist {master,incremental}] 
+                        [--master MASTER] 
+                        [--incremental INCREMENTAL] 
+                        [--database DATABASE] 
+                        [--collection COLLECTION] 
+                        [--local LOCAL]
+                        [--overwrite]
+                        [--download] 
+                        [--metadata]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --host URL            MongoDB URI [mongodb://localhost:27017]
+  --host HOST           MongoDB URI [mongodb://localhost:27017]
   --ziplist {master,incremental}
                         Download master or incremental file
-  --master MASTER       GDELT master file [http://data.gdeltproject.org/gdeltv
-                        2/masterfilelist.txt]
+  --master MASTER       GDELT master file [http://data.gdeltproject.org/gdeltv2/masterfilelist.txt]
   --incremental INCREMENTAL
-                        GDELT incremental file
-                        [http://data.gdeltproject.org/gdeltv2/lastupdate.txt]
+                        GDELT incremental file [http://data.gdeltproject.org/gdeltv2/lastupdate.txt]
+  --database DATABASE   Default database for loading [GDELT]
+  --collection COLLECTION
+                        Default collection for loading [events_csv]
   --local LOCAL         load data from local list of zips
   --overwrite           Overwrite files when they exist already
   --download            download zip files from master or local file
-  --mapgeo              map all lat,lon data to GeoJSON
+  --metadata            grab meta data files
 ```
 
 To operate first get the master list of event files.
@@ -50,16 +72,40 @@ pipenv install pymongoimport
 
 Now import the CSV files.
 ```
-pymongoimport --host $MONGODB --fieldfile GDELT.ff --delimiter tab --database GDELT --collection events *.CSV
+pymongoimport --host $MONGODB --fieldfile GDELT.ff --delimiter tab --database GDELT --collection events_csv *.CSV
 ```
 
 You may also used [mongoimport](https://docs.mongodb.com/database-tools/mongoimport/) to load fields faster but remember to create a field file for that
 program first. 
 
-Once you have imoported the data you can convert the longitude and latitude fields to GeoJSON points
-by using the `--mapgeo` command. 
+## transforming the data
 
-``python gdeltloader/gdeltloader.py --mapgeo``
+You can generate GeoJSON points from the existing  geo-location lat/long filed
+by using `gdeltloader/mapgeolocation.py`.
 
-This will convert each lat/long pair to a single GeoJSON point and delete the original coordinate fields. 
+```shell
+usage: mapgeolocation.py [-h] [--host HOST] [--database DATABASE] [-i INPUTCOLLECTION] [-o OUTPUTCOLLECTION]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --host HOST           MongoDB URI [mongodb://localhost:27017]
+  --database DATABASE   Default database for loading [GDELT]
+  -i INPUTCOLLECTION, --inputcollection INPUTCOLLECTION
+                        Default collection for input [events_csv]
+  -o OUTPUTCOLLECTION, --outputcollection OUTPUTCOLLECTION
+                        Default collection for output [events]
+```
+This program expects to read and write data from a database called GDELT. The 
+default input collection is `events_csv` and the default output collection is 
+`events`.
+
+To transform the collections run:
+```shell
+python gdeltloader/mapgeolocation.py
+Processed documents total : 247441
+```
+If you run `mapgeolocation.py` on the same dataset it will overwrite the records.
+Each new data-set will be merged into previous collections of documents. 
+
+
 
