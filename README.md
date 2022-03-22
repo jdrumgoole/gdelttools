@@ -53,3 +53,13 @@ Now import the CSV files.
 pymongoimport --host $MONGODB --fieldfile GDELT.ff --delimiter tab --database GDELT --collection events *.CSV
 ```
 
+You may also used [mongoimport](https://docs.mongodb.com/database-tools/mongoimport/) to load fields faster but remember to create a field file for that
+program first. 
+
+Once you have imoported the data you can convert the longitude and latitude fields to GeoJSON points
+by using the `--mapgeo` command. 
+
+``python gdeltloader/gdeltloader.py --mapgeo``
+
+This will convert each lat/long pair to a single GeoJSON point and delete the original coordinate fields. 
+
