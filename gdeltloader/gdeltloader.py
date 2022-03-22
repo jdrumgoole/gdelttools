@@ -144,17 +144,21 @@ if __name__ == "__main__":
 
     if args.mapgeo:
         print("Mapping lat/lon to GeoJSON")
-        matcher = { "$match" : {"ActionGeo_Lat": { "$type" : "double"},
-                                "ActionGeo_Lon" : { "$type" : "double"},
-                                "Actor1Geo_Lat" : { "$type" : "double"},
-                                "Actor1Geo_Lon" : { "$type" : "double"},
-                                "Actor2Geo_lat" : { "$type" : "double"},
-                                "Actor2Geo_Lon" : { "$type" : "double"}}}
+        matcher = {"$match": {"ActionGeo_Lat": {"$type": "double"},
+                              "ActionGeo_Long": {"$type": "double"},
+                              "Actor1Geo_Lat": {"$type": "double"},
+                              "Actor1Geo_Long": {"$type": "double"},
+                              "Actor2Geo_Lat": {"$type": "double"},
+                              "Actor2Geo_Long": {"$type": "double"}}}
     
         adder = {"$addFields": {"Actor1Geo": {"type": "Point", "coordinates": ["$Actor1Geo_Long", "$Actor1Geo_Lat"]},
                                 "Actor2Geo": {"type": "Point", "coordinates": ["$Actor2Geo_Long", "$Actor2Geo_Lat"]},
                                 "ActionGeo": {"type": "Point", "coordinates": ["$ActionGeo_Long", "$ActionGeo_Lat"]}}}
-        events__collection.aggregate([matcher, adder, {"$out" : "events_geo"}])
+
+        deleter = {"$unset": ["ActionGeo_Lat", "ActionGeo_Long", "Actor1Geo_Lat",
+                              "Actor1Geo_Long", "Actor2Geo_Lat", "Actor2Geo_Long"]}
+
+        events__collection.aggregate([matcher, adder, deleter, {"$out": "events_geo"}])
         sys.exit(0)
 
     if args.local:
