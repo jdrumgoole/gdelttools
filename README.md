@@ -1,5 +1,9 @@
 ## Loading GDELT data into MongoDB
 
+## Installation
+
+To get started either install the prerequisites from the `Pipfile` or use `pipenv shell` to create a virtual environment and have `pipenv` do the work for you.  This package only supports Python 3.6 or latter.
+
 ### GDELT 2.0 Encoding and Structure
 The [GDELT](https://gdelt.org) dataset is a large dataset of news events that is updated
 in real-time. GDELT stands for Global Database of Events Location and Tone. The format
