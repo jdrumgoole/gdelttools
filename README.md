@@ -100,7 +100,7 @@ Now import the CSV files with [mongoimport](https://docs.mongodb.com/database-to
 awk '{print}' *.CSV > events_export.csv
 
 # Import a CSV file
-mongoimport --uri="$MONGODB" --fieldFile="GDELT_fieldFile.txt" --db="GDELT" --collection="events_csv" --type="tsv" --columnsHaveTypes events_export.csv
+mongoimport --uri="$MONGODB" --fieldFile="GDELT_fieldFile.txt" --db="GDELT" --collection="events_csv" --type="tsv" --columnsHaveTypes --parseGrace="skipField" events_export.csv
 ```
 
 ### Transforming the data

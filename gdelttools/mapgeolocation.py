@@ -49,4 +49,4 @@ if __name__ == "__main__":
                          "whenNotMatched": "insert"}}
     input_collection.aggregate([matcher, adder, deleter, merger])
     output_collection = db[args.outputcollection]
-    print(f"Processed documents total : {output_collection.count_documents({})}")
+    print(f"Processed {output_collection.count_documents({})} documents with geolocation data")
