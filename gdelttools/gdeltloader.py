@@ -126,4 +126,4 @@ if __name__ == "__main__":
             input_file_list.append(filename)
 
     if args.download:
-        download_zips(input_file_list)
+        download_zips(events_collection, input_file_list)
