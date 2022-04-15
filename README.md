@@ -86,7 +86,7 @@ $
 now download the data.
 
 ```shell
-python3 gdelttools/gdelttools.py --host $MONGODB --download --local last_365_days.txt
+python3 gdelttools/gdeltloader.py --host $MONGODB --download --local last_365_days.txt
 ```
 
 Host tells us a database to store the files we have downloaded. The local argument tells us
