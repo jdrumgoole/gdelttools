@@ -89,16 +89,21 @@ now download the data.
 python3 gdelttools/gdeltloader.py --host $MONGODB --download --local last_365_days.txt
 ```
 
-Host tells us a database to store the files we have downloaded. The local argument tells us
-the location of the local file on disk. This command will download all the associated zip files
-and unpack them into uncompress .CSV files. 
+Host tells us a database to store the files we have downloaded. The local argument tells us the location of the local file on disk. This command will download all the associated zip files and unpack them into uncompressed .CSV files.
 
+## Import the CSV files into MongoDB
 
 Now import the CSV files with [mongoimport](https://docs.mongodb.com/database-tools/mongoimport/).
 
-**Need mongoimport example here**
+```shell
+# Combine all CSV files into a single file for import
+awk '{print}' *.CSV > events_export.csv
 
-### transforming the data
+# Import a CSV file
+mongoimport --uri="$MONGODB" --fieldFile="GDELT_fieldFile.txt" --db="GDELT" --collection="events_csv" --type="tsv" --columnsHaveTypes events_export.csv
+```
+
+### Transforming the data
 
 You can generate GeoJSON points from the existing  geo-location lat/long filed
 by using `gdelttools/mapgeolocation.py`.
