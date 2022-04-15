@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Importer for GDELT 2.0 raw data set.
 https://blog.gdeltproject.org/gdelt-2-0-our-global-world-in-realtime/
@@ -86,7 +88,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--metadata", action="store_true", default=False,
                         help="grab meta data files")
-    args = parser.parse_args()
+    args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
     # if args.ziplist == "master":
     #     url = args.master
