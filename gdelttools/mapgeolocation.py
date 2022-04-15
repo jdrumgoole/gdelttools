@@ -25,6 +25,10 @@ if __name__ == "__main__":
     input_collection = db[args.inputcollection]
     output_collection = db[args.outputcollection]
 
+    print(f"Processing {input_collection.count_documents({})} documents "
+          f"from {args.database}.{args.inputcollection} "
+          f"into {args.database}.{args.outputcollection}")
+
     matcher = {"$match": {"ActionGeo_Lat": {"$type": "double"},
                           "ActionGeo_Long": {"$type": "double"},
                           "Actor1Geo_Lat": {"$type": "double"},
