@@ -2,7 +2,26 @@
 
 ## Installation
 
-To get started either install the prerequisites from the `Pipfile` or use `pipenv shell` to create a virtual environment and have `pipenv` do the work for you.  This package only supports Python 3.6 or latter.
+### Install requirements using Pipenv (recommended)
+
+[Pipenv](https://pipenv.pypa.io/en/latest/) is a tool that helps create and manage environments and dependencies for Python projects. It is optional, but recommended.
+
+To install Pipenv:
+
+> pip3 install --user pipenv
+
+To get started with GDELT Tools, either install the prerequisites from the `Pipfile` using `pipenv install` or use `pipenv shell` to create a virtual environment and have `pipenv` do the work for you.  This package only supports Python 3.6 or later.
+
+### Install requirements using Pip (alternative to Pipenv)
+
+`pip3` should be automatically installed if you are using Python 3. You can install or upgrade `pip3` using:
+
+> python3 -m ensurepip --upgrade
+
+To install GDELT Tools using pip3:
+
+> pip3 install -r requirements.txt
+
 
 ### GDELT 2.0 Encoding and Structure
 The [GDELT](https://gdelt.org) dataset is a large dataset of news events that is updated
@@ -41,7 +60,7 @@ optional arguments:
 
 To operate first get the master and the update list of event files.
 
-``python gdelttools/gdeltloader.py --master --update``
+``python3 gdelttools/gdeltloader.py --master --update``
 
 Now grab the subset of files you want. For us lets grab the last 365 days of events. There 
 are three times of files in the master and update files:
@@ -58,7 +77,7 @@ We just want the previous 365 days of events so we use the master file to get th
 365 exports files as so. 
 
 ```shell
-$ grep export gdelt_master-file-04-08-2019-14-13-28.txt | tail -n 365 > last_365_days.txt
+$ grep export gdelt-update-file-04-08-2019-14-13-28.txt | tail -n 365 > last_365_days.txt
 $ wc last_365_days.txt
   365  1095 38847 last_365_days.txt
 $
@@ -67,7 +86,7 @@ $
 now download the data.
 
 ```shell
-python gdelttools/gdelttools.py --host $MONGODB --download --local last_365_days.txt 
+python3 gdelttools/gdelttools.py --host $MONGODB --download --local last_365_days.txt
 ```
 
 Host tells us a database to store the files we have downloaded. The local argument tells us
@@ -102,7 +121,7 @@ default input collection is `events_csv` and the default output collection is
 
 To transform the collections run:
 ```shell
-python gdelttools/mapgeolocation.py
+python3 gdelttools/mapgeolocation.py
 Processed documents total : 247441
 ```
 If you run `mapgeolocation.py` on the same dataset it will overwrite the records.
