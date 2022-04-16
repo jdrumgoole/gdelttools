@@ -39,12 +39,13 @@ def download_zips(collection, file_list: List[str]):
                 if computed_md5 == md5:
                     print(f"Unzipping: '{local_zip_file}'")
                     local_csv_files = extract_zip_file(local_zip_file)
-                    collection.insert_one({"_id": zipurl,
-                                           "ts": datetime.utcnow(),
-                                           "local_zip_file": local_zip_file,
-                                           "local_csv_file": local_csv_files[0],
-                                           "size": size,
-                                           "md5_zip_file": md5})
+                    if collection:
+                        collection.insert_one({"_id": zipurl,
+                                               "ts": datetime.utcnow(),
+                                               "local_zip_file": local_zip_file,
+                                               "local_csv_file": local_csv_files[0],
+                                               "size": size,
+                                               "md5_zip_file": md5})
                 else:
                     print(f"'{md5}' checksum for {zip} doesn't match computed\n"
                           f" checksum: {computed_md5} for {local_zip_file}")
@@ -55,8 +56,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--host", default="mongodb://localhost:27017",
-                        help="MongoDB URI [%(default)s]")
+    parser.add_argument("--host",
+                        help="MongoDB URI")
 
     parser.add_argument("--master",
                         default=False,
@@ -96,10 +97,12 @@ if __name__ == "__main__":
     gdelt_md5_list = "http://data.gdeltproject.org/events/md5sums"
     gdelt_file_sizes = "http://data.gdeltproject.org/events/filesizes"
 
-    client = pymongo.MongoClient(host=args.host)
-    db = client[args.database]
-    files_collection = db["files"]
-    events_collection = db[args.collection]
+    files_collection = None
+    if args.host:
+        client = pymongo.MongoClient(host=args.host)
+        db = client[args.database]
+        files_collection = db["files"]
+        events_collection = db[args.collection]
 
     if args.metadata:
         Downloader.get_metadata()
@@ -124,4 +127,4 @@ if __name__ == "__main__":
             input_file_list.append(filename)
 
     if args.download:
-        download_zips(input_file_list)
+        download_zips(files_collection, input_file_list)

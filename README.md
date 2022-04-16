@@ -1,5 +1,51 @@
 ## Loading GDELT data into MongoDB
 
+## Quick Start
+
+Install the latest version of Python from [python.org](https://www.python.org/downloads/)
+You need at least version 3.6 for this program. Many versions of Python that
+come pre-install are only 2.7. This version will not work.
+
+Install pipenv:
+
+```pip3 install pipenv```
+
+Now clone this repo into a local directory (`git` will need to be installed
+for this step):
+
+```git clone https://github.com/jdrumgoole/gdelttools.git```
+
+Now is the directory that you cloned (this will have a file called `Pipfile` in it)
+run:
+
+``pipenv shell``
+
+Now we need to install the dependencies for this program:
+
+``pipenv sync``
+
+Now add the package to your path:
+
+`export PYTHONPATH=<path to repo dir>/gdelttools`
+
+Now you can cut and paste the following commands to get your first download
+working:
+
+```commandline
+python gdelttools/gdeltloader.py --master --update
+```
+Now using the file you just generated run this grep 
+command to extract the last 365 days of data.
+
+```commandline
+grep export grep export  gdelt-update-file-04-16-2022-12-40-10.txt | tail -n 365 > last_365_days.txt  | tail -n 365 > last_365_days.txt
+```
+
+Now you can download the list of files you just created using the command
+
+```commandline
+python gdelttools/gdeltloader.py --download --local last_365_days.txt
+```
 ## Installation
 
 To get started either install the prerequisites from the `Pipfile` or use `pipenv shell` to create a virtual environment and have `pipenv` do the work for you.  This package only supports Python 3.6 or latter.

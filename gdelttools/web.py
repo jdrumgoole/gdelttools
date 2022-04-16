@@ -50,7 +50,7 @@ def extract_zip_file(filepath):
     files = []
     for finfo in zfile.namelist():
         with zfile.open(finfo, "r") as input:
-            with open(finfo, "w") as output:
+            with open(finfo, "w", encoding="utf-8") as output:
                 for i in input:
                     output.write(i.decode("utf-8"))
         files.append(finfo)
