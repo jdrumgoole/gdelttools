@@ -1,30 +1,30 @@
 
-
 from setuptools import setup, find_packages
 import os
 import glob
+
+
+this_directory = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 pyfiles = [f for f in os.listdir(".") if f.endswith(".py")]
 
 setup(
     name="gdelttools",
-    version="0.04a1",
+    version="0.04a11",
 
     author="Joe Drumgoole",
     author_email="joe@joedrumgoole.com",
-    description="gdelttools - tools to help with downloading GDELT data",
-    long_description=
-    '''
-A set of tools to support downloading GDELT data. This includes downloading, unzipping and storing the meta data
-''',
-
-    license="http://www.apache.org/licenses/LICENSE-2.0",
+    description="A set of tools to support downloading GDELT data",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    license="Apache 2.0",
     keywords="MongoDB GDELT dataset",
     url="https://github.com/jdrumgoole/gdelttools",
 
     install_requires=['pymongo',
                       'requests',
-                      'dnspython',
                     ],
     classifiers=[
         # How mature is this project? Common values are

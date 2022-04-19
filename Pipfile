@@ -11,6 +11,8 @@ pymongoimport = "*"
 twine = "*"
 keyring = "*"
 build = "*"
+pypandoc = "*"
+pandoc = "*"
 
 [dev-packages]
 

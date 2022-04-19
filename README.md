@@ -1,55 +1,37 @@
 ## Loading GDELT data into MongoDB
 
+This is a set of programs for loading the [GDELT 2.0](https:/gdeltproject.org) data set into MongoDB. 
+
 ## Quick Start
 
 Install the latest version of Python from [python.org](https://www.python.org/downloads/)
 You need at least version 3.6 for this program. Many versions of Python that
 come pre-install are only 2.7. This version will not work.
 
-Install pipenv:
+Now install `gdelttools`
 
-```pip3 install pipenv```
+```shell
+pip install gdelttools
+```
 
-Now clone this repo into a local directory (`git` will need to be installed
-for this step):
+Now get the master file of all the GDELT files. 
 
-```git clone https://github.com/jdrumgoole/gdelttools.git```
-
-Now is the directory that you cloned (this will have a file called `Pipfile` in it)
-run:
-
-``pipenv shell``
-
-Now we need to install the dependencies for this program:
-
-``pipenv sync``
-
-Now add the package to your path:
-
-`export PYTHONPATH=<path to repo dir>/gdelttools`
-
-Now you can cut and paste the following commands to get your first download
-working:
-
-```commandline
+```shell
 python gdelttools/gdeltloader.py --master --update
 ```
-Now using the file you just generated run this grep 
-command to extract the last 365 days of data.
+Now using the file you just generated run this `grep` 
+command to extract the last 365 days of data. Note you will need to
+substitute the file you just created. 
 
-```commandline
+```shell
 grep export grep export  gdelt-update-file-04-16-2022-12-40-10.txt | tail -n 365 > last_365_days.txt  | tail -n 365 > last_365_days.txt
 ```
 
 Now you can download the list of files you just created using the command
 
-```commandline
+```shell
 python gdelttools/gdeltloader.py --download --local last_365_days.txt
 ```
-## Installation
-
-To get started either install the prerequisites from the `Pipfile` or use `pipenv shell` to create a virtual environment and have `pipenv` do the work for you.  This package only supports Python 3.6 or latter.
-
 ### GDELT 2.0 Encoding and Structure
 The [GDELT](https://gdelt.org) dataset is a large dataset of news events that is updated
 in real-time. GDELT stands for Global Database of Events Location and Tone. The format
@@ -65,15 +47,17 @@ from which the CAMEO encoding is derived.
 
 ## How to download GDELT 2.0 data
 
-The `gdelttools/gdeltloader.py` script can download cameo data an unzip the files so that
+The `gdeltloader` script can download cameo data an unzip the files so that
 they can be loaded into MongoDB.
 
 ```
-usage: gdeltloader.py [-h] [--host HOST] [--master] [--update] [--database DATABASE] [--collection COLLECTION] [--local LOCAL] [--overwrite] [--download] [--metadata]
+usage: gdeltloader [-h] [--host HOST] [--master] [--update]
+                   [--database DATABASE] [--collection COLLECTION]
+                   [--local LOCAL] [--overwrite] [--download] [--metadata]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --host HOST           MongoDB URI [mongodb://localhost:27017]
+  --host HOST           MongoDB URI
   --master              GDELT master file [False]
   --update              GDELT update file [False]
   --database DATABASE   Default database for loading [GDELT]
@@ -87,7 +71,7 @@ optional arguments:
 
 To operate first get the master and the update list of event files.
 
-``python gdelttools/gdeltloader.py --master --update``
+``gdeltloader --master --update``
 
 Now grab the subset of files you want. For us lets grab the last 365 days of events. There 
 are three times of files in the master and update files:
@@ -113,7 +97,7 @@ $
 now download the data.
 
 ```shell
-python gdelttools/gdelttools.py --host $MONGODB --download --local last_365_days.txt 
+gdeltloader --download --local last_365_days.txt 
 ```
 
 Host tells us a database to store the files we have downloaded. The local argument tells us
