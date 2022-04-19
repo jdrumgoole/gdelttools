@@ -19,7 +19,12 @@ python_bin:
 build:
 	python3 -m build
 
-prod_build:clean build
+gitit:
+	git add -u
+	git commit -m"Update for product build"
+	git push
+
+prod_build:clean gitit build
 	twine upload --repository-url https://upload.pypi.org/legacy/ dist/* -u jdrumgoole
 
 test_build: clean build

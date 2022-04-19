@@ -12,7 +12,7 @@ pyfiles = [f for f in os.listdir(".") if f.endswith(".py")]
 
 setup(
     name="gdelttools",
-    version="0.04a11",
+    version="0.04a12",
 
     author="Joe Drumgoole",
     author_email="joe@joedrumgoole.com",
