@@ -52,7 +52,7 @@ def download_zips(collection, file_list: List[str]):
                     sys.exit(0)
 
 
-if __name__ == "__main__":
+def main():
 
     parser = argparse.ArgumentParser()
 
@@ -128,3 +128,7 @@ if __name__ == "__main__":
 
     if args.download:
         download_zips(files_collection, input_file_list)
+
+
+if __name__ == "__main__":
+    main()

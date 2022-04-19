@@ -8,6 +8,9 @@ requests = "*"
 pymongo = "*"
 dnspython = "*"
 pymongoimport = "*"
+twine = "*"
+keyring = "*"
+build = "*"
 
 [dev-packages]
 

@@ -8,7 +8,7 @@ pyfiles = [f for f in os.listdir(".") if f.endswith(".py")]
 
 setup(
     name="gdelttools",
-    version="0.01a",
+    version="0.04a1",
 
     author="Joe Drumgoole",
     author_email="joe@joedrumgoole.com",
@@ -18,13 +18,13 @@ setup(
 A set of tools to support downloading GDELT data. This includes downloading, unzipping and storing the meta data
 ''',
 
-    license="AGPL",
-    keywords="MongoDB GDELT",
+    license="http://www.apache.org/licenses/LICENSE-2.0",
+    keywords="MongoDB GDELT dataset",
     url="https://github.com/jdrumgoole/gdelttools",
 
     install_requires=['pymongo',
-                      'requests'
-                      'dnspython'
+                      'requests',
+                      'dnspython',
                     ],
     classifiers=[
         # How mature is this project? Common values are
@@ -35,13 +35,12 @@ A set of tools to support downloading GDELT data. This includes downloading, unz
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
-
-        # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: GNU Affero General Public License v3',
-
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.7'],
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+    ],
 
     # setup_requires=["pymongo",
     #                   "nose",

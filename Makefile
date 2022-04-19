@@ -16,10 +16,13 @@ python_bin:
 	python -c "import os;print(os.environ.get('USERNAME'))"
 	which python
 
-prod_build:clean clean dist test
+build:
+	python3 -m build
+
+prod_build:clean build
 	twine upload --repository-url https://upload.pypi.org/legacy/ dist/* -u jdrumgoole
 
-test_build: clean sdist test
+test_build: clean build
 	twine upload --repository-url https://test.pypi.org/legacy/ dist/* -u jdrumgoole
 
 #
@@ -34,27 +37,17 @@ nose:
 	which python
 	nosetests
 
-dist:
-	python setup.py bdist
-
-sdist:
-	python setup.py sdist
-
-bdist_wheel:
-	python setup.py bdist_wheel
-
 test_install:
-	pip install --extra-index-url=https://pypi.org/ -i https://test.pypi.org/simple/ pymongoimport
+	pip install --extra-index-url=https://pypi.org/ -i https://test.pypi.org/simple/ gdelttools
 
 clean:
-	rm -rf dist bdist sdist
+	rm -rf dist
 
 pkgs:
-	pipenv install pymongo keyring twine nose semvermanager
+	pipenv sync
 
 init: pkgs
 	keyring set https://test.pypi.org/legacy/ ${USERNAME}
 	keyring set https://upload.pypi.org/legacy/ ${USERNAME}
 
-collect:
-	python pymongoimport
+
