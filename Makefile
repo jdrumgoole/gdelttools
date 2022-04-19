@@ -22,7 +22,7 @@ build:
 gitit:
 	git add -u
 	git commit -m "Update for product build"
-	git push
+	- git push
 
 prod_build:clean gitit build
 	twine upload --repository-url https://upload.pypi.org/legacy/ dist/* -u jdrumgoole
