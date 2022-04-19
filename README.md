@@ -6,7 +6,7 @@ This is a set of programs for loading the [GDELT 2.0](https:/gdeltproject.org) d
 
 Install the latest version of Python from [python.org](https://www.python.org/downloads/)
 You need at least version 3.6 for this program. Many versions of Python that
-come pre-install are only 2.7. This version will not work.
+come pre-installed are only 2.7. This version will not work.
 
 Now install `gdelttools`
 
@@ -17,21 +17,25 @@ pip install gdelttools
 Now get the master file of all the GDELT files. 
 
 ```shell
-python gdelttools/gdeltloader.py --master --update
+gdeltloader --master --update
 ```
+
+This will generate a file named something like `gdelt-update-file-04-19-2022-19-33-56.txt`
+
 Now using the file you just generated run this `grep` 
 command to extract the last 365 days of data. Note you will need to
 substitute the file you just created. 
 
 ```shell
-grep export grep export  gdelt-update-file-04-16-2022-12-40-10.txt | tail -n 365 > last_365_days.txt  | tail -n 365 > last_365_days.txt
+grep export gdelt-update-file-[MM-DD-YYYY-HH-MM-SS].txt | tail -n 365 > last_365_days.txt  | tail -n 365 > last_365_days.txt
 ```
 
 Now you can download the list of files you just created using the command
 
 ```shell
-python gdelttools/gdeltloader.py --download --local last_365_days.txt
+gdeltloader --download --local last_365_days.txt
 ```
+
 ### GDELT 2.0 Encoding and Structure
 The [GDELT](https://gdelt.org) dataset is a large dataset of news events that is updated
 in real-time. GDELT stands for Global Database of Events Location and Tone. The format
