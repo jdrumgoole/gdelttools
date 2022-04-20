@@ -21,7 +21,7 @@ build:
 
 gitit:
 	git add -u
-	git commit -m "Update for product build"
+	- git commit -m "Update for product build"
 	- git push
 
 prod_build:clean gitit build
