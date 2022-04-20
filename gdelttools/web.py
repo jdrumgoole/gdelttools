@@ -49,10 +49,11 @@ def extract_zip_file(filepath):
     zfile = zipfile.ZipFile(filepath)
     files = []
     for finfo in zfile.namelist():
-        with zfile.open(finfo, "r") as input:
-            with open(finfo, "w", encoding="utf-8") as output:
-                for i in input:
-                    output.write(i.decode("utf-8"))
-        files.append(finfo)
+        with zipfile.ZipFile(filepath) as archive:
+            for zfilename in archive.namelist():
+                text = archive.read(zfilename).decode(encoding="utf-8")
+                with open(zfilename, "w") as output_file:
+                    output_file.write(text)
+            files.append(zfilename)
 
     return files

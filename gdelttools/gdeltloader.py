@@ -19,7 +19,7 @@ from gdelttools.web import local_path, download_file, compute_md5, extract_zip_f
 from gdelttools.gdeltcsv import Downloader
 from gdelttools._version import __version__
 
-def download_zips(collection, file_list: List[str]):
+def download_zips(collection, file_list: List[str], overwrite=False):
     for f in file_list:
         with open(f, "r") as input_file:
             for line in input_file:
@@ -28,7 +28,7 @@ def download_zips(collection, file_list: List[str]):
                 md5 = str(md5)
                 # print(f"{size}:{sha}:{zip}")
                 local_zip_file = local_path(zipurl)
-                if os.path.exists(local_zip_file) and not args.overwrite:
+                if os.path.exists(local_zip_file) and not overwrite:
                     print(f"File '{local_zip_file}'exists locally cannot overwrite")
                     sys.exit(1)
                 else:
@@ -108,26 +108,31 @@ def main():
         Downloader.get_metadata()
 
     input_file_list = []
+
+    if args.master:
+        print(f"Getting master file from '{Downloader.master_url}'")
+        filename = Downloader.get_master_list()
+        print(f"created: {filename}")
+        input_file_list.append(filename)
+
+    if args.update:
+        print(f"Getting update file from '{Downloader.update_url}'")
+        filename = Downloader.get_update_list()
+        input_file_list.append(filename)
+        print(f"created: {filename}")
+
     if args.local:
         if os.path.isfile(args.local):
             input_file_list.append(args.local)
         else:
             print(f"'{args.local}' does not exist")
             sys.exit(1)
-    elif args.master or args.update:
-        if args.update:
-            print(f"Getting update file from '{Downloader.update_url}'")
-            filename = Downloader.get_update_list()
-            input_file_list.append(filename)
-            print(f"created: {filename}")
-        if args.master:
-            print(f"Getting master file from '{Downloader.master_url}'")
-            filename = Downloader.get_master_list()
-            print(f"created: {filename}")
-            input_file_list.append(filename)
 
     if args.download:
-        download_zips(files_collection, input_file_list)
+        if len(input_file_list) > 0:
+            download_zips(files_collection, input_file_list, args.overwrite)
+        else:
+            print(f"No files listed for download")
 
 
 if __name__ == "__main__":
