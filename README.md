@@ -17,17 +17,17 @@ pip install gdelttools
 Now get the master file of all the GDELT files. 
 
 ```shell
-gdeltloader --master --update
+gdeltloader --master
 ```
 
-This will generate a file named something like `gdelt-update-file-04-19-2022-19-33-56.txt`
+This will generate a file named something like `gdelt-master-file-04-19-2022-19-33-56.txt`
 
 Now using the file you just generated run this `grep` 
 command to extract the last 365 days of data. Note you will need to
 substitute the file you just created. 
 
 ```shell
-grep export gdelt-update-file-[MM-DD-YYYY-HH-MM-SS].txt | tail -n 365 > last_365_days.txt  | tail -n 365 > last_365_days.txt
+grep export gdelt-master-file-[MM-DD-YYYY-HH-MM-SS].txt | tail -n 365 > last_365_days.txt  | tail -n 365 > last_365_days.txt
 ```
 
 Now you can download the list of files you just created using the command
