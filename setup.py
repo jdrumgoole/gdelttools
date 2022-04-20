@@ -8,11 +8,20 @@ this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+VERSIONFILE="gdelttools/_version.py"
+with open(VERSIONFILE, "rt") as vfile:
+    for line in vfile:
+        line = line.strip()
+        (lhs, equals, rhs) = line.partition( "=")
+        if lhs.strip() == "__version__":
+            rhs = rhs.strip()
+            version_string = rhs.strip('"')
 pyfiles = [f for f in os.listdir(".") if f.endswith(".py")]
+
 
 setup(
     name="gdelttools",
-    version="0.04a13",
+    version=version_string,
 
     author="Joe Drumgoole",
     author_email="joe@joedrumgoole.com",

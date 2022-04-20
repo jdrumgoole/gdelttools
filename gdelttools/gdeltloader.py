@@ -17,7 +17,7 @@ import pymongo
 
 from gdelttools.web import local_path, download_file, compute_md5, extract_zip_file
 from gdelttools.gdeltcsv import Downloader
-
+from gdelttools._version import __version__
 
 def download_zips(collection, file_list: List[str]):
     for f in file_list:
@@ -54,7 +54,7 @@ def download_zips(collection, file_list: List[str]):
 
 def main():
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(epilog=f"Version: {__version__}")
 
     parser.add_argument("--host",
                         help="MongoDB URI")
