@@ -37,7 +37,7 @@ class Downloader:
     def get_master_list(cls):
         # get the archive of main data
         r = requests.get(cls.master_url, allow_redirects=True)
-        filename = f"gdelt-update-file-{datetime.utcnow().strftime('%m-%d-%Y-%H-%M-%S')}.txt"
+        filename = f"gdelt-master-file-{datetime.utcnow().strftime('%m-%d-%Y-%H-%M-%S')}.txt"
         with open(filename, 'w') as output_file:
             output_file.write(r.content.decode("utf-8"))
         return filename
