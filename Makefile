@@ -22,7 +22,7 @@ build:
 gitit:
 	git add -u
 	- git commit -m "Update for product build"
-	git tag -a `python gdelttools\__version__.py` -m"Make file update"
+	git tag -a `python gdelttools/_version.py` -m"Make file update"
 	- git push
 
 prod_build:clean gitit build
