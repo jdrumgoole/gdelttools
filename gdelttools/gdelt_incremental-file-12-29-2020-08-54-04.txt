@@ -1,3 +1,0 @@
-59535 76abe2743a3f95d7a269ebd10b13fb9a http://data.gdeltproject.org/gdeltv2/20201229090000.export.CSV.zip
-97545 42e3bc7be6814f24ba092c3345a1737f http://data.gdeltproject.org/gdeltv2/20201229090000.mentions.CSV.zip
-4841354 355071f6741f5d5c4eeea1f08e120934 http://data.gdeltproject.org/gdeltv2/20201229090000.gkg.csv.zip

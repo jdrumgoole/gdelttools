@@ -22,7 +22,7 @@ build:
 gitit:
 	git add -u
 	- git commit -m "Update for product build"
-	git tag -a `python gdelttools/_version.py` -m"Make file update"
+	git tag -a `python gdelttools/gdeltloader.py --version` -m"Make file update"
 	- git push
 
 prod_build:clean gitit build
@@ -47,8 +47,8 @@ test_install:
 	pip install --extra-index-url=https://pypi.org/ -i https://test.pypi.org/simple/ gdelttools
 
 clean:
-	rm -rf dist
-	rm *.txt *.csv *.zip
+	-rm -rf dist
+	-rm *.txt *.CSV *.zip
 
 pkgs:
 	pipenv sync

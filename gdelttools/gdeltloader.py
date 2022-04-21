@@ -102,8 +102,9 @@ def main():
     parser.add_argument("--filefilter", default="export", choices=["export", "gkg", "mentions", "all"],
                         help="download a subset of the data, the default is the export data")
 
-    parser.add_argument("--last", default=365, type=int, help="how many recent days of data to download [%(default)s]")
+    parser.add_argument("--last", default=0, type=int, help="how many recent days of data to download default : [%(default)s] implies all files")
 
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     args = parser.parse_args()
 
     # if args.ziplist == "master":
@@ -116,6 +117,7 @@ def main():
 
     try:
         files_collection = None
+
         if args.host:
             client = pymongo.MongoClient(host=args.host)
             db = client[args.database]
