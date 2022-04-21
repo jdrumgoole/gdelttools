@@ -22,22 +22,28 @@ gdeltloader --master
 
 This will generate a file named something like `gdelt-master-file-04-19-2022-19-33-56.txt`
 
-Now using the file you just generated run this `grep` 
-command to extract the last 365 days of data. Note you will need to
-substitute the file you just created. 
+## Downloading the master data set
+
+To download the master data set associated with GDELT (the export files) you can combine
+these steps:
 
 ```shell
-grep export gdelt-master-file-[MM-DD-YYYY-HH-MM-SS].txt | tail -n 365 > last_365_days.txt  | tail -n 365 > last_365_days.txt
+gdeltloader --master --download --overwrite
 ```
 
-Now you can download the list of files you just created using the command
+This will get the master file, parse it, extract the list of CSV files and unzip them.
+the full GDELT 2.0 database runs to several terabytes of data so this is not recommend. 
+
+To limit the amount you download you can specify `--last` to define how many days of data
+you want to download:
 
 ```shell
-gdeltloader --download --local last_365_days.txt
+gdeltloader --master --download --overwrite --last 20
 ```
+Will download the most recent 20 days of data. 
 
 ### GDELT 2.0 Encoding and Structure
-The [GDELT](https://gdelt.org) dataset is a large dataset of news events that is updated
+The [GDELT](https://gdeltproject.org) dataset is a large dataset of news events that is updated
 in real-time. GDELT stands for Global Database of Events Location and Tone. The format
 of records in a GDELT data is defined by the [GDELT 2.0 Cookbook](http://data.gdeltproject.org/documentation/GDELT-Event_Codebook-V2.0.pdf)
 
@@ -58,6 +64,7 @@ they can be loaded into MongoDB.
 usage: gdeltloader [-h] [--host HOST] [--master] [--update]
                    [--database DATABASE] [--collection COLLECTION]
                    [--local LOCAL] [--overwrite] [--download] [--metadata]
+                   [--filefilter {export,gkg,mentions,all}] [--last LAST]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -71,6 +78,12 @@ optional arguments:
   --overwrite           Overwrite files when they exist already
   --download            download zip files from master or local file
   --metadata            grab meta data files
+  --filefilter {export,gkg,mentions,all}
+                        download a subset of the data, the default is the
+                        export data
+  --last LAST           how many recent days of data to download [365]
+
+Version: 0.06a
 ```
 
 To operate first get the master and the update list of event files.
