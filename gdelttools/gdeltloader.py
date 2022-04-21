@@ -114,42 +114,46 @@ def main():
     gdelt_md5_list = "http://data.gdeltproject.org/events/md5sums"
     gdelt_file_sizes = "http://data.gdeltproject.org/events/filesizes"
 
-    files_collection = None
-    if args.host:
-        client = pymongo.MongoClient(host=args.host)
-        db = client[args.database]
-        files_collection = db["files"]
-        events_collection = db[args.collection]
+    try:
+        files_collection = None
+        if args.host:
+            client = pymongo.MongoClient(host=args.host)
+            db = client[args.database]
+            files_collection = db["files"]
+            events_collection = db[args.collection]
 
-    if args.metadata:
-        Downloader.get_metadata()
+        if args.metadata:
+            Downloader.get_metadata()
 
-    input_file_list = []
+        input_file_list = []
 
-    if args.master:
-        print(f"Getting master file from '{Downloader.master_url}'")
-        filename = Downloader.get_master_list()
-        print(f"created: {filename}")
-        input_file_list.append(filename)
+        if args.master:
+            print(f"Getting master file from '{Downloader.master_url}'")
+            filename = Downloader.get_master_list()
+            print(f"created: {filename}")
+            input_file_list.append(filename)
 
-    if args.update:
-        print(f"Getting update file from '{Downloader.update_url}'")
-        filename = Downloader.get_update_list()
-        input_file_list.append(filename)
-        print(f"created: {filename}")
+        if args.update:
+            print(f"Getting update file from '{Downloader.update_url}'")
+            filename = Downloader.get_update_list()
+            input_file_list.append(filename)
+            print(f"created: {filename}")
 
-    if args.local:
-        if os.path.isfile(args.local):
-            input_file_list.append(args.local)
-        else:
-            print(f"'{args.local}' does not exist")
-            sys.exit(1)
+        if args.local:
+            if os.path.isfile(args.local):
+                input_file_list.append(args.local)
+            else:
+                print(f"'{args.local}' does not exist")
+                sys.exit(1)
 
-    if args.download:
-        if len(input_file_list) > 0:
-            download_zips(files_collection, input_file_list, args.last, args.filefilter, args.overwrite)
-        else:
-            print(f"No files listed for download")
+        if args.download:
+            if len(input_file_list) > 0:
+                download_zips(files_collection, input_file_list, args.last, args.filefilter, args.overwrite)
+            else:
+                print(f"No files listed for download")
+    except KeyboardInterrupt:
+        print("Exiting...")
+        sys.exit(0)
 
 
 if __name__ == "__main__":
