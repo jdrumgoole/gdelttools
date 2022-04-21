@@ -2,8 +2,9 @@ import hashlib
 import urllib
 import zipfile
 import requests
+from requests import exceptions
 from io import BytesIO
-from zipfile import ZipFile
+
 
 
 def download_and_unzip(u: str):
@@ -27,9 +28,11 @@ def local_path(url):
     filename = filename_with_args.split('?')[0]
     return filename
 
+
 def download_file(url):
     local_filename = local_path(url)
     # NOTE the stream=True parameter below
+
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
@@ -42,6 +45,7 @@ def download_file(url):
                     # f.flush()
             if i % 80 != 0:
                 print("")
+
     return local_filename
 
 

@@ -9,7 +9,7 @@ http://data.gdeltproject.org/gdeltv2/masterfilelist.txt
 import argparse
 from typing import List
 
-import requests
+from requests import exceptions
 import sys
 from datetime import datetime
 import os
@@ -20,46 +20,55 @@ from gdelttools.gdeltcsv import Downloader
 from gdelttools._version import __version__
 
 
-def download_zips(collection, file_list: List[str], last=365, file_filter=None, overwrite=False):
+def download_zips(collection, file_list: List[str], last=None, file_filter=None, overwrite=False):
     if file_filter == None:
         file_filter = "export"
+    if last is None or last < 0:
+        last = 0
+
     for f in file_list:
         lines = []
         with open(f, "r") as input_file:
             for input_line in input_file:
                 lines.append(input_line)
 
-            section = len(lines) - (last * 3)  # three files per set, gkg, exports, mentions
-            lines = lines[section:]  # slice the last days
-            for l in lines:
-                size, md5, zipurl = l.split()
-                size = int(size)
-                md5 = str(md5)
-                # print(f"{size}:{sha}:{zip}")
-                if (file_filter in zipurl) or (file_filter == "all"):
-                    local_zip_file = local_path(zipurl)
-                    if os.path.exists(local_zip_file) and not overwrite:
-                        print(f"File '{local_zip_file}'exists locally cannot overwrite")
-                        sys.exit(1)
-                    else:
-                        print(f"Downloading:'{zipurl} size: {size}'")
-                        download_file(zipurl)
-                        computed_md5 = compute_md5(local_zip_file)
+            if last > 0 :
+                section = len(lines) - (last * 3)  # three files per set, gkg, exports, mentions
+                lines = lines[section:]  # slice the last days
 
-                    if computed_md5 == md5:
-                        print(f"Unzipping: '{local_zip_file}'")
-                        local_csv_files = extract_zip_file(local_zip_file)
-                        if collection:
-                            collection.insert_one({"_id": zipurl,
-                                                   "ts": datetime.utcnow(),
-                                                   "local_zip_file": local_zip_file,
-                                                   "local_csv_file": local_csv_files[0],
-                                                   "size": size,
-                                                   "md5_zip_file": md5})
-                    else:
-                        print(f"'{md5}' checksum for {zip} doesn't match computed\n"
-                              f" checksum: {computed_md5} for {local_zip_file}")
-                        sys.exit(0)
+            for l in lines:
+                try:
+                    size, md5, zipurl = l.split()
+                    size = int(size)
+                    md5 = str(md5)
+                    # print(f"{size}:{sha}:{zip}")
+                    if (file_filter in zipurl) or (file_filter == "all"):
+                        local_zip_file = local_path(zipurl)
+                        if os.path.exists(local_zip_file) and not overwrite:
+                            print(f"File '{local_zip_file}'exists locally cannot overwrite")
+                            sys.exit(1)
+                        else:
+                            print(f"Downloading:'{zipurl} size: {size}'")
+                            download_file(zipurl)
+                            computed_md5 = compute_md5(local_zip_file)
+
+                        if computed_md5 == md5:
+                            print(f"Unzipping: '{local_zip_file}'")
+                            local_csv_files = extract_zip_file(local_zip_file)
+                            if collection:
+                                collection.insert_one({"_id": zipurl,
+                                                       "ts": datetime.utcnow(),
+                                                       "local_zip_file": local_zip_file,
+                                                       "local_csv_file": local_csv_files[0],
+                                                       "size": size,
+                                                       "md5_zip_file": md5})
+                        else:
+                            print(f"'{md5}' checksum for {zip} doesn't match computed\n"
+                                  f" checksum: {computed_md5} for {local_zip_file}")
+                            sys.exit(0)
+                except exceptions.HTTPError as e:
+                    print(f"Error for {zipurl}")
+                    print(e)
 
 
 def main():
