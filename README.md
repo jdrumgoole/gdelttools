@@ -94,6 +94,8 @@ gdeltloader --master --update --download --last 365``
 This command will only download the `export` files for the last 365 days which
 are the files we are interested in. 
 
+## How to import downloaded data into MongoDB
+
 Now import the CSV files with [mongoimport](https://docs.mongodb.com/database-tools/mongoimport/).
 
 There is a [mongoimport.sh](https://raw.githubusercontent.com/jdrumgoole/gdelttools/master/mongoimport.sh)
