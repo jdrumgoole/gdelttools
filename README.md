@@ -96,9 +96,18 @@ are the files we are interested in.
 
 Now import the CSV files with [mongoimport](https://docs.mongodb.com/database-tools/mongoimport/).
 
-There is a script in the [gdelttools](https://github.com/jdrumgoole/gdelttools) repo
-which can help with this and a field file, gdelt_field_file.ff which will properly 
-map the internal types during import.
+There is a [mongoimport.sh](https://raw.githubusercontent.com/jdrumgoole/gdelttools/master/mongoimport.sh)
+script in the [gdelttools](https://github.com/jdrumgoole/gdelttools) repo
+which is already configured with the right arguments.  There is also a corresponding
+field file, 
+[gdelt_field_file.ff](https://raw.githubusercontent.com/jdrumgoole/gdelttools/master/gdelt_field_file.ff) 
+which this script uses to ensure correct type mappings.
+
+To run:
+
+`sh mongoimport.sh`
+
+it will upload all the CSV files in the current working directory. 
 
 ### transforming the data
 

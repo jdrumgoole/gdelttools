@@ -46,6 +46,7 @@ test_scripts: clean
 	python gdelttools/gdeltloader.py --update --overwrite
 	python gdelttools/gdeltloader.py --update --download --last 1 --overwrite
 	python gdelttools/gdeltloader.py --master --download --last 3 --overwrite
+	sh mongoimport.sh
 
 test_all: nose test_scripts
 
