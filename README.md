@@ -113,6 +113,17 @@ it will upload all the CSV files in the current working directory.
 
 ### transforming the data
 
+With our data now in MongoDB, we have some cleanup to do. 
+The next steps refine and reshape the data via Aggregation Pipelines. 
+To run these aggregations, I used the 
+[MongoDB Extension for VSCode](https://code.visualstudio.com/docs). 
+Just connect to your cluster, then run the aggregations in this repo (in order!).
+
+1. Convert raw latitude, longitude strings to double type. Then, create GeoJSON points out of them. You can do this by running the `convert-geojson-pipeline.mongodb` aggregation. 
+
+2. Compress the documents. You can do this by running the `compress-pipeline.mongodb` aggregation.
+
+
 You can generate GeoJSON points from the existing  geo-location lat/long filed
 by using `gdelttools/mapgeolocation.py`.
 

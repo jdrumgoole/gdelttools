@@ -25,6 +25,14 @@ gitit:
 	git tag -a `python gdelttools/gdeltloader.py --version | cut -f2 -d' '` -m"Make file update"
 	- git push
 
+reshape:
+	mongosh --file=gdelt_reshaper.js
+
+dataload:
+	python gdelttools/gdeltloader.py --master --download --last 20
+	sh mongoimport.sh
+	mongosh --file=gdelt_reshaper.js
+
 prod_build:clean gitit build
 	twine upload --repository-url https://upload.pypi.org/legacy/ dist/* -u jdrumgoole
 
