@@ -45,15 +45,14 @@ def download_zips(collection, file_list: List[str], last=None, file_filter=None,
                     if (file_filter in zipurl) or (file_filter == "all"):
                         local_zip_file = local_path(zipurl)
                         if os.path.exists(local_zip_file) and not overwrite:
-                            print(f"File '{local_zip_file}'exists locally cannot overwrite")
-                            sys.exit(1)
+                            print(f"File '{local_zip_file}'exists already")
                         else:
-                            print(f"Downloading:'{zipurl} size: {size}'")
                             download_file(zipurl)
-                            computed_md5 = compute_md5(local_zip_file)
+
+                        computed_md5 = compute_md5(local_zip_file)
 
                         if computed_md5 == md5:
-                            print(f"Unzipping: '{local_zip_file}'")
+
                             local_csv_files = extract_zip_file(local_zip_file)
                             if collection:
                                 collection.insert_one({"_id": zipurl,
@@ -139,16 +138,12 @@ def main():
         input_file_list = []
 
         if args.master:
-            print(f"Getting master file from '{Downloader.master_url}'")
-            filename = Downloader.get_master_list()
-            print(f"created: {filename}")
+            filename = Downloader.get_master_list(args.overwrite)
             input_file_list.append(filename)
 
         if args.update:
-            print(f"Getting update file from '{Downloader.update_url}'")
-            filename = Downloader.get_update_list()
+            filename = Downloader.get_update_list(args.overwrite)
             input_file_list.append(filename)
-            print(f"created: {filename}")
 
         if args.local:
             if os.path.isfile(args.local):

@@ -4,6 +4,7 @@ import zipfile
 import requests
 from requests import exceptions
 from io import BytesIO
+import os
 
 
 
@@ -29,35 +30,45 @@ def local_path(url):
     return filename
 
 
-def download_file(url):
+def download_file(url, overwrite=False):
     local_filename = local_path(url)
     # NOTE the stream=True parameter below
+
+    if os.path.exists(local_filename) and not overwrite:
+        print(f"{local_filename} already exists")
+        return local_filename
+    else:
+        print(f"Downloading: {url}")
 
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
             for i, chunk in enumerate(r.iter_content(chunk_size=8192), 1):
+                width = os.get_terminal_size().columns
                 if chunk:  # filter out keep-alive new chunks
                     print(".", end="")
-                    if i % 80 == 0:
+                    if i % width == 0:
                         print("")
                     f.write(chunk)
                     # f.flush()
-            if i % 80 != 0:
+            if i % width != 0:
                 print("")
 
     return local_filename
 
 
 def extract_zip_file(filepath):
-    zfile = zipfile.ZipFile(filepath)
     files = []
-    for finfo in zfile.namelist():
-        with zipfile.ZipFile(filepath) as archive:
-            for zfilename in archive.namelist():
-                text = archive.read(zfilename).decode(encoding="utf-8")
-                with open(zfilename, "w") as output_file:
-                    output_file.write(text)
+    with zipfile.ZipFile(filepath) as archive:
+        print(f"unzipping: '{filepath}'")
+        for zfilename in archive.namelist():
+            if os.path.exists(zfilename):
+                print(f"{zfilename} exists, skipping unzipping")
+                continue
+            text = archive.read(zfilename).decode(encoding="utf-8")
+            print(f"extracting: '{zfilename}'")
+            with open(zfilename, "w") as output_file:
+                output_file.write(text)
             files.append(zfilename)
 
     return files

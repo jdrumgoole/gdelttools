@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from gdelttools import web
 import requests
 
 
@@ -25,19 +25,11 @@ class Downloader:
         return [cls.checksum_filename, cls.size_filename]
 
     @classmethod
-    def get_update_list(cls):
-        # get the list of updates this year
-        r = requests.get(cls.update_url, allow_redirects=True)
-        filename = f"gdelt-update-file-{datetime.utcnow().strftime('%m-%d-%Y-%H-%M-%S')}.txt"
-        with open(filename, 'w') as output_file:
-            output_file.write(r.content.decode("utf-8"))
-        return filename
+    def get_update_list(cls, overwrite=False):
+        return web.download_file(cls.update_url, overwrite)
+
 
     @classmethod
-    def get_master_list(cls):
-        # get the archive of main data
-        r = requests.get(cls.master_url, allow_redirects=True)
-        filename = f"gdelt-master-file-{datetime.utcnow().strftime('%m-%d-%Y-%H-%M-%S')}.txt"
-        with open(filename, 'w') as output_file:
-            output_file.write(r.content.decode("utf-8"))
-        return filename
+    def get_master_list(cls, overwrite=False):
+        return web.download_file(cls.master_url, overwrite)
+

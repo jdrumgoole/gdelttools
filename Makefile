@@ -34,8 +34,18 @@ test_build: clean build
 #
 # Just test that these scripts run
 #
-test_scripts:
+test_scripts: clean
 	(export PYTHONPATH=`pwd` && python gdelttools/gdeltloader.py -h > /dev/null >&1)
+	python gdelttools/gdeltloader.py --master
+	python gdelttools/gdeltloader.py --master --download --last 1
+	python gdelttools/gdeltloader.py --update
+	python gdelttools/gdeltloader.py --update --download --last 1
+	python gdelttools/gdeltloader.py --master --download --last 3
+	python gdelttools/gdeltloader.py --master --overwrite
+	python gdelttools/gdeltloader.py --master --download --last 1 --overwrite
+	python gdelttools/gdeltloader.py --update --overwrite
+	python gdelttools/gdeltloader.py --update --download --last 1 --overwrite
+	python gdelttools/gdeltloader.py --master --download --last 3 --overwrite
 
 test_all: nose test_scripts
 

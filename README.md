@@ -86,45 +86,19 @@ optional arguments:
 Version: 0.06a
 ```
 
-To operate first get the master and the update list of event files.
+Here is how to download the last 365 days of GDELT data. 
 
-``gdeltloader --master --update``
-
-Now grab the subset of files you want. For us lets grab the last 365 days of events. There 
-are three times of files in the master and update files:
 ```
-150383 297a16b493de7cf6ca809a7cc31d0b93 http://data.gdeltproject.org/gdeltv2/20150218230000.export.CSV.zip
-318084 bb27f78ba45f69a17ea6ed7755e9f8ff http://data.gdeltproject.org/gdeltv2/20150218230000.mentions.CSV.zip
-10768507 ea8dde0beb0ba98810a92db068c0ce99 http://data.gdeltproject.org/gdeltv2/20150218230000.gkg.csv.zip
-```
-
-Export files contain event data. Mentions contain other mentions of the initial news event in the current 15
-minute cycle. GKS files contain the global knowledge graph.
-
-We just want the previous 365 days of events so we use the master file to get the previous 
-365 exports files as so. 
-
-```shell
-$ grep export gdelt_master-file-04-08-2019-14-13-28.txt | tail -n 365 > last_365_days.txt
-$ wc last_365_days.txt
-  365  1095 38847 last_365_days.txt
-$
-```
-
-now download the data.
-
-```shell
-gdeltloader --download --local last_365_days.txt 
-```
-
-Host tells us a database to store the files we have downloaded. The local argument tells us
-the location of the local file on disk. This command will download all the associated zip files
-and unpack them into uncompress .CSV files. 
-
+gdeltloader --master --update --download --last 365``
+````
+This command will only download the `export` files for the last 365 days which
+are the files we are interested in. 
 
 Now import the CSV files with [mongoimport](https://docs.mongodb.com/database-tools/mongoimport/).
 
-**Need mongoimport example here**
+There is a script in the [gdelttools](https://github.com/jdrumgoole/gdelttools) repo
+which can help with this and a field file, gdelt_field_file.ff which will properly 
+map the internal types during import.
 
 ### transforming the data
 
