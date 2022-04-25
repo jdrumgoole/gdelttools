@@ -13,6 +13,7 @@ keyring = "*"
 build = "*"
 pypandoc = "*"
 pandoc = "*"
+nose = "*"
 
 [dev-packages]
 

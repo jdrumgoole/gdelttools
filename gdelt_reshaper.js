@@ -142,3 +142,4 @@ const GDELTAggregation = [
 ];
 
 db.eventscsv.aggregate(GDELTAggregation);
+exit;

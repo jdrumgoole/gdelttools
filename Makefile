@@ -8,13 +8,8 @@
 PYPIUSERNAME="jdrumgoole"
 ROOT=${HOME}/GIT/gdelttools
 
-root:
-	@echo "The project ROOT is '${ROOT}'"
-
-
-python_bin:
-	python -c "import os;print(os.environ.get('USERNAME'))"
-	which python
+all: test_all build test_build
+	-echo "Ace King, Check it out! A full build"
 
 build:
 	python3 -m build
@@ -28,42 +23,54 @@ gitit:
 reshape:
 	mongosh --file=gdelt_reshaper.js
 
-dataload:
-	python gdelttools/gdeltloader.py --master --download --last 20
+full_dataload:
+	python gdelttools/gdeltloader.py --master --download
+	sh mongoimport.sh
+	mongosh --file=gdelt_reshaper.js
+
+test_dataload:
+	python gdelttools/gdeltloader.py --master --download --last 1
 	sh mongoimport.sh
 	mongosh --file=gdelt_reshaper.js
 
 prod_build:clean gitit build
 	twine upload --repository-url https://upload.pypi.org/legacy/ dist/* -u jdrumgoole
 
-test_build: clean build
+test_build: clean nose_test build
 	twine upload --repository-url https://test.pypi.org/legacy/ dist/* -u jdrumgoole
 
 #
 # Just test that these scripts run
 #
-test_scripts: clean
-	(export PYTHONPATH=`pwd` && python gdelttools/gdeltloader.py -h > /dev/null >&1)
-	python gdelttools/gdeltloader.py --master
-	python gdelttools/gdeltloader.py --master --download --last 1
-	python gdelttools/gdeltloader.py --update
-	python gdelttools/gdeltloader.py --update --download --last 1
-	python gdelttools/gdeltloader.py --master --download --last 3
-	python gdelttools/gdeltloader.py --master --overwrite
-	python gdelttools/gdeltloader.py --master --download --last 1 --overwrite
-	python gdelttools/gdeltloader.py --update --overwrite
-	python gdelttools/gdeltloader.py --update --download --last 1 --overwrite
-	python gdelttools/gdeltloader.py --master --download --last 3 --overwrite
-	sh mongoimport.sh
+full_test: clean test_scripts clean
+	echo "Full Test Complete"
 
-test_all: nose test_scripts
-
-nose:
-	which python
+nose_test: clean
 	nosetests
 
-test_install:
-	pip install --extra-index-url=https://pypi.org/ -i https://test.pypi.org/simple/ gdelttools
+test_scripts: clean
+	(export PYTHONPATH=`pwd` && python gdelttools/gdeltloader.py -h > /dev/null >&1)
+	python gdelttools/gdeltloader.py --master > /dev/null
+	python gdelttools/gdeltloader.py --master --download --last 1 > /dev/null
+	python gdelttools/gdeltloader.py --update > /dev/null
+	python gdelttools/gdeltloader.py --update --download --last 1 > /dev/null
+	python gdelttools/gdeltloader.py --master --download --last 3 > /dev/null
+	python gdelttools/gdeltloader.py --master --overwrite > /dev/null
+	python gdelttools/gdeltloader.py --master --download --last 1 --overwrite > /dev/null
+	python gdelttools/gdeltloader.py --update --overwrite > /dev/null
+	python gdelttools/gdeltloader.py --update --download --last 1 --overwrite > /dev/null
+	python gdelttools/gdeltloader.py --master --download --last 3 --overwrite > /dev/null
+	rm *.zip > /dev/null
+	python gdelttools/gdeltloader.py --master --download --last 3 > /dev/null
+	rm *.CSV > /dev/null
+	python gdelttools/gdeltloader.py --master --download --last 3 > /dev/null
+	rm *.CSV *.zip > /dev/null
+	python gdelttools/gdeltloader.py --master --download --last 3 > /dev/null
+	sh mongoimport.sh > /dev/null
+
+test_all: clean nose_test test_dataload test_scripts
+	-echo "Tests complete"
+
 
 clean:
 	-rm -rf dist

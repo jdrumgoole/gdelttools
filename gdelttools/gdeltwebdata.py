@@ -1,9 +1,9 @@
 from datetime import datetime
-from gdelttools import web
+from gdelttools.web import WebDownload
 import requests
 
 
-class Downloader:
+class GDELTWebData:
 
     gdelt_md5_list = "http://data.gdeltproject.org/events/md5sums"
     gdelt_file_sizes = "http://data.gdeltproject.org/events/filesizes"
@@ -12,6 +12,8 @@ class Downloader:
 
     master_url = "http://data.gdeltproject.org/gdeltv2/masterfilelist.txt"
     update_url = "http://data.gdeltproject.org/gdeltv2/lastupdate.txt"
+
+    downloader = WebDownload()
 
     @classmethod
     def get_metadata(cls):
@@ -26,10 +28,9 @@ class Downloader:
 
     @classmethod
     def get_update_list(cls, overwrite=False):
-        return web.download_file(cls.update_url, overwrite)
-
+        return cls.downloader.download_url(cls.update_url)
 
     @classmethod
     def get_master_list(cls, overwrite=False):
-        return web.download_file(cls.master_url, overwrite)
+        return cls.downloader.download_url(cls.master_url)
 

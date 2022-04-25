@@ -34,13 +34,19 @@ gdeltloader --master --download --overwrite
 This will get the master file, parse it, extract the list of CSV files and unzip them.
 the full GDELT 2.0 database runs to several terabytes of data so this is not recommend. 
 
-To limit the amount you download you can specify `--last` to define how many days of data
+The `overwrite` argument ruthlessly overwrites all files with extreme prejudice. Without
+it the `gdeltloader` script will attempt to reuse the files you have already downloaded. As
+each file is unique this may save time if you need to re-download some files. 
+
+To limit the amount you download you can specify `--last` to define how many files worth of data
 you want to download:
 
 ```shell
 gdeltloader --master --download --overwrite --last 20
 ```
-Will download the most recent 20 days of data. 
+Will download the most recent 20 files worth of data. Not that a file is a triplet of 
+`export`, `mentions` and `gkg` data. If you only want one you should specify a 
+`--filter`. Without the filter a command like the above will actually download 60 files. 
 
 ### GDELT 2.0 Encoding and Structure
 The [GDELT](https://gdeltproject.org) dataset is a large dataset of news events that is updated
@@ -111,45 +117,7 @@ To run:
 
 it will upload all the CSV files in the current working directory. 
 
-### transforming the data
 
-With our data now in MongoDB, we have some cleanup to do. 
-The next steps refine and reshape the data via Aggregation Pipelines. 
-To run these aggregations, I used the 
-[MongoDB Extension for VSCode](https://code.visualstudio.com/docs). 
-Just connect to your cluster, then run the aggregations in this repo (in order!).
-
-1. Convert raw latitude, longitude strings to double type. Then, create GeoJSON points out of them. You can do this by running the `convert-geojson-pipeline.mongodb` aggregation. 
-
-2. Compress the documents. You can do this by running the `compress-pipeline.mongodb` aggregation.
-
-
-You can generate GeoJSON points from the existing  geo-location lat/long filed
-by using `gdelttools/mapgeolocation.py`.
-
-```shell
-usage: mapgeolocation.py [-h] [--host HOST] [--database DATABASE] [-i INPUTCOLLECTION] [-o OUTPUTCOLLECTION]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --host HOST           MongoDB URI [mongodb://localhost:27017]
-  --database DATABASE   Default database for loading [GDELT]
-  -i INPUTCOLLECTION, --inputcollection INPUTCOLLECTION
-                        Default collection for input [events_csv]
-  -o OUTPUTCOLLECTION, --outputcollection OUTPUTCOLLECTION
-                        Default collection for output [events]
-```
-This program expects to read and write data from a database called GDELT. The 
-default input collection is `events_csv` and the default output collection is 
-`events`.
-
-To transform the collections run:
-```shell
-python gdelttools/mapgeolocation.py
-Processed documents total : 247441
-```
-If you run `mapgeolocation.py` on the same dataset it will overwrite the records.
-Each new data-set will be merged into previous collections of documents. 
 
 
 
