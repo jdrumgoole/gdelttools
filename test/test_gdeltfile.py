@@ -2,7 +2,7 @@ import unittest
 import os
 import zipfile
 
-from gdelttools.web import GDELTFilter, GDELTFile, download_gdelt_files
+from gdelttools.gdeltfile import GDELTFile, GDELTFilter, download_gdelt_files
 
 
 class TestGDeltFile(unittest.TestCase):
@@ -69,5 +69,4 @@ class TestGDeltFile(unittest.TestCase):
 
         self.assertRaises(zipfile.BadZipfile, GDELTFile.unzip, "threefiles.zip")
         os.unlink("threefiles.zip")
-
-        #os.unlink("threefiles.txt")
+        os.unlink("threefiles.txt")
