@@ -92,12 +92,12 @@ optional arguments:
 Version: 0.06a
 ```
 
-Here is how to download the last 365 days of GDELT data. 
+Here is how to download the last 5 hours of GDELT data. 
 
+```shell
+gdeltloader --master --update --download --last 20
 ```
-gdeltloader --master --update --download --last 365``
-````
-This command will only download the `export` files for the last 365 days which
+This command will only download the `export` files for the last 20 15-minute blocks, which
 are the files we are interested in. 
 
 ## How to import downloaded data into MongoDB
@@ -113,7 +113,9 @@ which this script uses to ensure correct type mappings.
 
 To run:
 
-`sh mongoimport.sh`
+```shell
+sh mongoimport.sh --uri "<YOUR-MONGODB-CONNECTION-STRING>"
+```
 
 it will upload all the CSV files in the current working directory. 
 
