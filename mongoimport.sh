@@ -34,12 +34,11 @@ myloc=$(dirname $(findme $0))
 
 fieldfile="${myloc}/gdelt_field_file.ff"
 
-cat *.export.CSV \
-    | mongoimport \
-        --collection=eventscsv \
-        --mode=upsert \
-        --writeConcern '{w:1}' \
-        --type=tsv \
-        --columnsHaveTypes \
-        --fieldFile="${fieldfile}" \
+cat *.export.CSV | mongoimport \
+    --collection=eventscsv \
+    --mode=upsert \
+    --writeConcern '{w:1}' \
+    --type=tsv \
+    --columnsHaveTypes \
+    --fieldFile="${fieldfile}" \
         $*
