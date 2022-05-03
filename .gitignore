@@ -107,6 +107,7 @@ venv.bak/
 *.CSV
 *.csv.zip
 *.CSV.zip
+*master*.txt
 
 .mypy_cache/
 .idea/
