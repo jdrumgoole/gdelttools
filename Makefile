@@ -6,10 +6,13 @@
 
 
 PYPIUSERNAME="jdrumgoole"
-ROOT=${HOME}/GIT/gdelttools
+#
+# Hack the right PYTHONPATH into make subshells.
+#
+SHELL:=PYTHONPATH=${HOME}/GIT/gdelttools ${SHELL}
 
 all: test_all build test_build
-	-echo "Ace King, Check it out! A full build"
+	-@echo "Ace King, Check it out! A full build"
 
 build:
 	python3 -m build
@@ -21,17 +24,25 @@ gitit:
 	- git push
 
 reshape:
-	mongosh --file=gdelt_reshaper.js
+	mongosh --quiet --file=gdelt_reshaper.js
 
 full_dataload:
 	python gdelttools/gdeltloader.py --master --download
 	sh mongoimport.sh
 	mongosh --file=gdelt_reshaper.js
 
+#
+# This target assumes a local mongod is running
+#
 test_dataload:
 	python gdelttools/gdeltloader.py --master --download --last 1
 	sh mongoimport.sh
 	mongosh --file=gdelt_reshaper.js
+	-rm -rf dist
+	-rm *.txt *.CSV *.csv *.zip
+
+test_import:
+	python gdelttools/gdeltloader.py --master --download --filter export --importdata --overwrite --last 1
 
 prod_build:clean gitit build
 	twine upload --repository-url https://upload.pypi.org/legacy/ dist/* -u jdrumgoole
@@ -43,7 +54,7 @@ test_build: clean nose_test build
 # Just test that these scripts run
 #
 full_test: clean test_scripts clean
-	echo "Full Test Complete"
+	- @echo "Full Test Complete"
 
 nose_test: clean
 	nosetests
@@ -67,14 +78,18 @@ test_scripts: clean
 	rm *.CSV *.zip > /dev/null
 	python gdelttools/gdeltloader.py --master --download --last 3 > /dev/null
 	sh mongoimport.sh > /dev/null
+	-rm -rf dist
+	-rm *.txt *.CSV *.csv *.zip
 
 test_all: clean nose_test test_dataload test_scripts
-	-echo "Tests complete"
+	-rm -rf dist
+	-rm *.txt *.CSV *.csv *.zip
+	- @echo "Tests complete"
 
 
 clean:
 	-rm -rf dist
-	-rm *.txt *.CSV *.zip
+	-rm *.txt *.CSV *.csv *.zip
 
 pkgs:
 	pipenv sync

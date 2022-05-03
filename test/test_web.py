@@ -22,6 +22,7 @@ class TestDownload(unittest.TestCase):
             os.unlink(self.photo_name)
         self._wd.download_url(self.photo_url, self.photo_name)
         self.assertTrue(os.path.exists(self.photo_name))
+        os.unlink(self.photo_name)
 
     def test_download_lines(self):
         if os.path.exists(self.text_filename):
@@ -31,14 +32,15 @@ class TestDownload(unittest.TestCase):
                 output_file.write(f"{line}")
             self.assertEqual(i, 2000)
         self.assertEqual(os.path.getsize(self.text_filename), 213940)
+        os.unlink(self.text_filename)
 
     def test_download_url(self):
         self._wd.download_url(self.text_url, self.text_filename+"1")
         url_size = os.path.getsize(self.text_filename+"1")
         self.test_download_lines()
-        line_size = os.path.getsize(self.text_filename)
+        line_size = os.path.getsize(self.text_filename+"1")
         self.assertEqual(url_size, line_size)
-
+        os.unlink(self.text_filename+"1")
 
 if __name__ == '__main__':
     unittest.main()

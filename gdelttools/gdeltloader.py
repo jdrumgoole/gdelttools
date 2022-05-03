@@ -11,18 +11,25 @@ import sys
 import os
 import pymongo
 
-from gdelttools.web import download_gdelt_files, GDELTFilter
+from gdelttools.gdeltfile import download_gdelt_files, GDELTFilter
 from gdelttools.gdeltwebdata import GDELTWebData
 from gdelttools._version import __version__
+from gdelttools.mongoimport import MongoImport
+
 
 def main():
 
     parser = argparse.ArgumentParser(epilog=f"Version: {__version__}\n"
                                             f"More info : https://github.com/jdrumgoole/gdelttools ")
 
-    # parser.add_argument("--host",
-    #                     help="MongoDB URI")
+    parser.add_argument("--host",
+                        help="MongoDB URI")
 
+    parser.add_argument("--database", default="GDELT2",
+                        help="Default database for loading [%(default)s]")
+
+    parser.add_argument("--collection", default="eventscsv",
+                        help="Default collection for loading [%(default)s]")
     parser.add_argument("--master",
                         default=False,
                         action="store_true",
@@ -32,12 +39,6 @@ def main():
                         default=False,
                         action="store_true",
                         help="GDELT update file [%(default)s]")
-
-    parser.add_argument("--database", default="GDELT",
-                        help="Default database for loading [%(default)s]")
-
-    parser.add_argument("--collection", default="events_csv",
-                        help="Default collection for loading [%(default)s]")
 
     parser.add_argument("--local", type=str,
                         help="load data from local list of zips")
@@ -49,6 +50,8 @@ def main():
     parser.add_argument("--download", default=False, action="store_true",
                         help="download zip files from master or local file")
 
+    parser.add_argument("--importdata", default=False, action="store_true",
+                        help="Import files into MongoDB")
     parser.add_argument("--metadata", action="store_true", default=False,
                         help="grab meta data files")
 
@@ -102,9 +105,15 @@ def main():
 
         if args.download:
             if len(input_file_list) > 0:
-                download_gdelt_files(input_file_list, args.last, args.filter, args.overwrite)
+                csv_files = download_gdelt_files(input_file_list, args.last, args.filter, args.overwrite)
             else:
                 print(f"No files listed for download")
+
+        if args.importdata:
+            importer = MongoImport(database_name=args.database, collection_name=args.collection)
+            for f in csv_files:
+                importer.import_data(f)
+
     except KeyboardInterrupt:
         print("Exiting...")
         sys.exit(0)

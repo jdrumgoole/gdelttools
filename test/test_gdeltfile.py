@@ -44,25 +44,38 @@ class TestGDeltFile(unittest.TestCase):
         download_gdelt_files(["threefiles.txt"], overwrite=True)
         self.assertTrue(os.path.exists("20150218230000.export.CSV.zip"))
         self.assertTrue(os.path.exists("20150218230000.mentions.CSV.zip"))
-        self.assertTrue(os.path.exists("20150218230000.gkg.CSV.zip"))
+        self.assertTrue(os.path.exists("20150218230000.gkg.csv.zip"))
+        os.unlink("20150218230000.export.CSV.zip")
+        os.unlink("20150218230000.mentions.CSV.zip")
+        os.unlink("20150218230000.gkg.csv.zip")
+        os.unlink("20150218230000.export.CSV")
+        os.unlink("20150218230000.mentions.CSV")
+        os.unlink("20150218230000.gkg.csv")
+
         download_gdelt_files(["threefiles.txt"])
         self.assertTrue(os.path.exists("20150218230000.export.CSV.zip"))
         self.assertTrue(os.path.exists("20150218230000.mentions.CSV.zip"))
         self.assertTrue(os.path.exists("20150218230000.gkg.CSV.zip"))
         os.unlink("20150218230000.export.CSV.zip")
         os.unlink("20150218230000.mentions.CSV.zip")
-        os.unlink("20150218230000.gkg.CSV.zip")
+        os.unlink("20150218230000.gkg.csv.zip")
         os.unlink("20150218230000.export.CSV")
         os.unlink("20150218230000.mentions.CSV")
-        os.unlink("20150218230000.gkg.CSV")
-        download_gdelt_files(["threefiles.txt"], last=0, filter=GDELTFilter.gkg)
-        self.assertTrue(os.path.exists("20150218230000.gkg.CSV.zip"))
+        os.unlink("20150218230000.gkg.csv")
+
+        download_gdelt_files(["threefiles.txt"], last=0, overwrite=True, filter=GDELTFilter.gkg)
+        self.assertTrue(os.path.exists("20150218230000.gkg.csv.zip"))
         self.assertFalse(os.path.exists("20150218230000.export.CSV.zip"))
         self.assertFalse(os.path.exists("20150218230000.mentions.CSV.zip"))
+        os.unlink("20150218230000.gkg.csv.zip")
+        os.unlink("20150218230000.gkg.csv")
+
         download_gdelt_files(["threefiles.txt"], last=0, filter=GDELTFilter.mentions)
-        self.assertTrue(os.path.exists("20150218230000.gkg.CSV.zip"))
+        self.assertFalse(os.path.exists("20150218230000.gkg.csv.zip"))
         self.assertFalse(os.path.exists("20150218230000.export.CSV.zip"))
         self.assertTrue(os.path.exists("20150218230000.mentions.CSV.zip"))
+        os.unlink("20150218230000.mentions.CSV.zip")
+        os.unlink("20150218230000.mentions.CSV")
 
         with open("threefiles.zip", "w") as tfile:
             tfile.write(GDELTFile.TEST_FILES)
@@ -70,3 +83,7 @@ class TestGDeltFile(unittest.TestCase):
         self.assertRaises(zipfile.BadZipfile, GDELTFile.unzip, "threefiles.zip")
         os.unlink("threefiles.zip")
         os.unlink("threefiles.txt")
+
+
+if __name__ == '__main__':
+    unittest.main()

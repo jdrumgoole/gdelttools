@@ -6,6 +6,7 @@ from enum import Enum
 
 from requests import exceptions
 
+#from gdelttools.mongoimport import MongoImport
 from gdelttools.web import WebDownload
 
 
@@ -158,6 +159,7 @@ def download_gdelt_files(file_list: list[str], last=None, filter:GDELTFilter=GDE
         #         section = len(lines) - (last * 3)  # three files per set, gkg, exports, mentions
         #         lines = lines[section:]  # slice the last days
 
+        #importer = MongoImport()
         for l in lines:
             try:
                 size, md5, zipurl = l.split()
@@ -165,6 +167,7 @@ def download_gdelt_files(file_list: list[str], last=None, filter:GDELTFilter=GDE
                 # print(f"{size}:{sha}:{zip}")
                 if (gdelt_file.filter.value in zipurl) or (gdelt_file.filter == GDELTFilter.all):
                     f = gdelt_file.process_zip_file(overwrite)
+                    #importer.command(f)
                     csv_files.append(f)
 
             except zipfile.BadZipfile as e:

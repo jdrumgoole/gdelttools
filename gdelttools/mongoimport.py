@@ -1,8 +1,10 @@
 import os
 from enum import Enum
-import json
+import shutil
 import glob
 
+class BinaryNotFoundError(OSError):
+    pass
 
 class FileType(Enum):
     tsv = "tsv"
@@ -30,6 +32,8 @@ class MongoImport:
     '''
 
     def __init__(self,
+                 prog: str = "mongoimport",
+                 uri: str = "mongodb://localhost:27017",
                  database_name: str="GDELT2",
                  collection_name: str="eventscsv",
                  file_type : FileType = FileType.tsv,
@@ -42,6 +46,8 @@ class MongoImport:
         :param collection: The collection name we will be importing to
         """
 
+        self._prog = prog
+        self._uri = uri
         self._database_name = database_name
         self._collection_name = collection_name
         self._file_type = file_type
@@ -49,12 +55,15 @@ class MongoImport:
         self._insert_mode = insert_mode
         self._write_concern = write_concern
 
+        if shutil.which(self._prog) is None:
+            raise BinaryNotFoundError(f"{self._prog}: Cannot be found on the current PATH")
+
     def command(self, input_file:str):
 
-        return f"mongoimport --db={self._database_name} --collection={self._collection_name} " +\
-               f"--type={self._file_type.value} --fieldFile={self._field_file} " +\
-               f"--mode={self._insert_mode.value} --writeConcern '{self._write_concern}' --columnsHaveTypes " +\
-               f"--file={input_file}"
+        return f"mongoimport --uri {self._uri} --db {self._database_name} --collection {self._collection_name} " +\
+               f"--type {self._file_type.value} --fieldFile {self._field_file} " +\
+               f"--mode {self._insert_mode.value} --writeConcern '{self._write_concern}' --columnsHaveTypes " +\
+               f"--file {input_file}"
 
     def import_data(self, arg:str):
         args = glob.glob(arg)
