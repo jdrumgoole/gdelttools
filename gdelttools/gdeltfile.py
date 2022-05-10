@@ -3,6 +3,7 @@ import os
 import sys
 import zipfile
 from enum import Enum
+from typing import List
 
 from requests import exceptions
 
@@ -143,12 +144,12 @@ class GDELTFile:
         return lines
 
 
-def download_gdelt_files(file_list: list[str], last=None, filter:GDELTFilter=GDELTFilter.all,  overwrite=False):
+def download_gdelt_files(file_list: List[str], last=None, filter:GDELTFilter=GDELTFilter.all,  overwrite=False):
 
     if last is None or last < 0:
         last = 0
 
-    csv_files: list[str] = []
+    csv_files: List[str] = []
     for f in file_list:
         lines = GDELTFile.get_input_files(f, last)
         # with open(f, "r") as input_file:
